@@ -68,3 +68,36 @@ Only `.env.example` should be committed.
 - `main` → Production
 - `dev` → Active development
 - `feature/*` → Small changes or experiments
+
+
+# 📲 Run on Physical iPhone
+
+## First Time Only (Device Build Required)
+
+1. Connect iPhone via cable
+2. Open Xcode once and enable:
+   - Signing & Capabilities
+   - Automatically manage signing
+   - Select your Apple Team
+
+Then run:
+
+```bash
+npx expo run:ios --device
+```
+
+This installs the development build on your phone.
+
+---
+
+## After First Install (Normal Development)
+
+Start Metro:
+
+```bash
+npx expo start --dev-client --tunnel
+```
+
+Then open the **GainOS dev app** on your phone.
+
+Changes will update instantly via Fast Refresh.
