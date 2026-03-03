@@ -1,0 +1,10 @@
+{
+  "name": "@gainos/ui",
+  "version": "0.1.0",
+  "private": true,
+  "main": "./src/theme.ts",
+  "types": "./src/theme.ts",
+  "devDependencies": {
+    "typescript": "^5.4.0"
+  }
+}

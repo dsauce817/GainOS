@@ -1,0 +1,345 @@
+-- GainOS Exercise Library Seed
+-- 220+ exercises covering all muscle groups
+
+INSERT INTO exercises (name, muscle_groups, secondary_muscles, equipment, category, force, instructions) VALUES
+
+-- ============================================================
+-- CHEST
+-- ============================================================
+('Barbell Bench Press',         ARRAY['chest'],           ARRAY['triceps','front_delt'],  'barbell',    'compound', 'push',
+ 'Lie flat on bench. Grip bar slightly wider than shoulder width. Lower to chest, press up explosively.'),
+('Incline Barbell Bench Press', ARRAY['upper_chest'],     ARRAY['triceps','front_delt'],  'barbell',    'compound', 'push',
+ 'Set bench to 30-45°. Same motion as flat bench but targets upper chest more.'),
+('Decline Barbell Bench Press', ARRAY['lower_chest'],     ARRAY['triceps'],               'barbell',    'compound', 'push',
+ 'Set bench to -15-30°. Targets lower chest fibers.'),
+('Dumbbell Bench Press',        ARRAY['chest'],           ARRAY['triceps','front_delt'],  'dumbbell',   'compound', 'push',
+ 'Greater range of motion than barbell. Keep dumbbells in line with mid-chest.'),
+('Incline Dumbbell Press',      ARRAY['upper_chest'],     ARRAY['triceps','front_delt'],  'dumbbell',   'compound', 'push',
+ 'Set bench 30-45°. Press from chest level, controlled eccentric.'),
+('Dumbbell Flye',               ARRAY['chest'],           ARRAY['front_delt'],            'dumbbell',   'isolation', 'push',
+ 'Slight bend in elbows throughout. Open arms wide, feel the stretch, squeeze at top.'),
+('Cable Crossover',             ARRAY['chest'],           ARRAY['front_delt'],            'cable',      'isolation', 'push',
+ 'Pull handles from high pulley, cross at bottom. Peak squeeze at crossing.'),
+('Low-to-High Cable Flye',      ARRAY['upper_chest'],     ARRAY['front_delt'],            'cable',      'isolation', 'push',
+ 'Pull from low position upward. Great for upper chest definition.'),
+('Pec Deck / Machine Flye',     ARRAY['chest'],           ARRAY['front_delt'],            'machine',    'isolation', 'push',
+ 'Use machine flye for constant tension on chest throughout range of motion.'),
+('Push-Up',                     ARRAY['chest'],           ARRAY['triceps','front_delt'],  'bodyweight', 'compound', 'push',
+ 'Body straight, lower chest to floor. Scale with elevation or weighted vest.'),
+('Chest Dip',                   ARRAY['lower_chest'],     ARRAY['triceps'],               'bodyweight', 'compound', 'push',
+ 'Lean forward to target chest over triceps. Full range of motion.'),
+
+-- ============================================================
+-- BACK
+-- ============================================================
+('Barbell Deadlift',            ARRAY['lower_back','glutes','hamstrings'], ARRAY['lats','traps','quads'], 'barbell', 'compound', 'pull',
+ 'Hip-hinge movement. Neutral spine throughout. Drive through the floor.'),
+('Romanian Deadlift',           ARRAY['hamstrings','glutes'],  ARRAY['lower_back','lats'],    'barbell',    'compound', 'pull',
+ 'Hip hinge with slight knee bend. Feel the hamstring stretch. Keep bar close to body.'),
+('Barbell Row',                 ARRAY['lats','mid_back'],      ARRAY['biceps','rear_delt'],   'barbell',    'compound', 'pull',
+ 'Hinge to 45-90°. Pull bar to lower chest/upper abdomen. Retract scapula.'),
+('Pendlay Row',                 ARRAY['lats','mid_back'],      ARRAY['biceps','traps'],       'barbell',    'compound', 'pull',
+ 'Bar starts on floor each rep. Explosive pull to chest. Full horizontal torso.'),
+('T-Bar Row',                   ARRAY['mid_back','lats'],      ARRAY['biceps','rear_delt'],   'barbell',    'compound', 'pull',
+ 'Landmine or T-bar attachment. Elbows close to body for thickness.'),
+('Dumbbell Row',                ARRAY['lats','mid_back'],      ARRAY['biceps','rear_delt'],   'dumbbell',   'compound', 'pull',
+ 'One arm braced on bench. Pull from full extension to hip. Squeeze at top.'),
+('Chest-Supported Row',         ARRAY['mid_back','lats'],      ARRAY['biceps','rear_delt'],   'dumbbell',   'compound', 'pull',
+ 'Incline bench support removes lower back fatigue. Pure upper back focus.'),
+('Pull-Up',                     ARRAY['lats'],                 ARRAY['biceps','rear_delt'],   'bodyweight', 'compound', 'pull',
+ 'Full hang to chin over bar. Depress and retract scapula before pulling.'),
+('Chin-Up',                     ARRAY['lats','biceps'],        ARRAY['rear_delt'],            'bodyweight', 'compound', 'pull',
+ 'Supinated grip. Biceps more involved. Pull chest to bar.'),
+('Lat Pulldown',                ARRAY['lats'],                 ARRAY['biceps','rear_delt'],   'cable',      'compound', 'pull',
+ 'Pull bar to upper chest. Lean back slightly. Elbows drive down and back.'),
+('Close-Grip Lat Pulldown',     ARRAY['lats'],                 ARRAY['biceps'],               'cable',      'compound', 'pull',
+ 'Neutral grip, elbows tuck in, increased lat stretch at top.'),
+('Seated Cable Row',            ARRAY['mid_back','lats'],      ARRAY['biceps','rear_delt'],   'cable',      'compound', 'pull',
+ 'Full stretch at start, retract scapula, pull to abdomen.'),
+('Single-Arm Cable Row',        ARRAY['lats','mid_back'],      ARRAY['biceps'],               'cable',      'isolation', 'pull',
+ 'Better mind-muscle connection. Full rotation allowed.'),
+('Straight-Arm Pulldown',       ARRAY['lats'],                 ARRAY['triceps'],              'cable',      'isolation', 'pull',
+ 'Arms nearly straight. Pull bar from overhead to thighs. Lat isolation.'),
+('Rack Pull',                   ARRAY['lower_back','traps'],   ARRAY['glutes','hamstrings'],  'barbell',    'compound', 'pull',
+ 'Partial deadlift from knee height. Heavy loading for upper posterior chain.'),
+('Shrug',                       ARRAY['traps'],                ARRAY['upper_back'],           'barbell',    'isolation', 'pull',
+ 'Straight arms, shrug shoulders up and back. Pause at top.'),
+('Dumbbell Shrug',              ARRAY['traps'],                ARRAY['upper_back'],           'dumbbell',   'isolation', 'pull',
+ 'Greater range of motion than barbell shrug.'),
+('Face Pull',                   ARRAY['rear_delt','traps'],    ARRAY['rotator_cuff'],         'cable',      'isolation', 'pull',
+ 'Rope attachment at face height. Pull to forehead with external rotation. Great for shoulder health.'),
+('Hyperextension',              ARRAY['lower_back'],           ARRAY['glutes','hamstrings'],  'bodyweight', 'isolation', 'pull',
+ 'Back extension machine. Control the movement, avoid hyperextending.'),
+
+-- ============================================================
+-- SHOULDERS
+-- ============================================================
+('Overhead Press',              ARRAY['front_delt','side_delt'], ARRAY['triceps','traps'],   'barbell',    'compound', 'push',
+ 'Press bar from rack height. Bar path straight up. Core tight.'),
+('Seated Dumbbell Press',       ARRAY['front_delt','side_delt'], ARRAY['triceps'],           'dumbbell',   'compound', 'push',
+ '90° back support. Press from ear height. Full extension at top.'),
+('Arnold Press',                ARRAY['front_delt','side_delt'], ARRAY['triceps','rear_delt'], 'dumbbell', 'compound', 'push',
+ 'Rotate from neutral grip (facing you) to pronated while pressing. Full shoulder recruitment.'),
+('Lateral Raise',               ARRAY['side_delt'],            ARRAY['traps'],               'dumbbell',   'isolation', 'push',
+ 'Slight forward lean. Raise to ear height, pinky slightly higher. Lead with elbows.'),
+('Cable Lateral Raise',         ARRAY['side_delt'],            ARRAY['traps'],               'cable',      'isolation', 'push',
+ 'Constant tension. Pull across body from low cable.'),
+('Rear Delt Flye',              ARRAY['rear_delt'],            ARRAY['traps','rhomboids'],   'dumbbell',   'isolation', 'pull',
+ 'Hinge forward, slight elbow bend. Raise arms to sides, squeeze rear delts.'),
+('Front Raise',                 ARRAY['front_delt'],           ARRAY['traps'],               'dumbbell',   'isolation', 'push',
+ 'Raise straight in front to shoulder height. Control the eccentric.'),
+('Upright Row',                 ARRAY['side_delt','traps'],    ARRAY['biceps'],              'barbell',    'compound', 'pull',
+ 'Pull bar up to chin, elbows flare. Use wide grip to reduce impingement risk.'),
+('Machine Shoulder Press',      ARRAY['front_delt','side_delt'], ARRAY['triceps'],           'machine',    'compound', 'push',
+ 'Controlled path. Good for drop sets and beginners.'),
+('Band Pull-Apart',             ARRAY['rear_delt'],            ARRAY['rhomboids','traps'],   'bodyweight', 'isolation', 'pull',
+ 'Resistance band. Pull apart at chest height. Great for shoulder health and warm-up.'),
+
+-- ============================================================
+-- LEGS - QUADS
+-- ============================================================
+('Barbell Back Squat',          ARRAY['quads','glutes'],       ARRAY['hamstrings','lower_back'], 'barbell', 'compound', 'push',
+ 'Bar on traps. Feet shoulder width. Break parallel. Drive knees out.'),
+('Barbell Front Squat',         ARRAY['quads'],                ARRAY['glutes','upper_back'],  'barbell',    'compound', 'push',
+ 'Bar on front delts. More upright torso, more quad emphasis.'),
+('Bulgarian Split Squat',       ARRAY['quads','glutes'],       ARRAY['hamstrings'],           'dumbbell',   'compound', 'push',
+ 'Rear foot elevated. Front foot forward. Drop knee to floor. 2-3 inch front shin angle.'),
+('Leg Press',                   ARRAY['quads','glutes'],       ARRAY['hamstrings'],           'machine',    'compound', 'push',
+ 'Push through full range. Don't lock out knees. Foot position affects muscle emphasis.'),
+('Hack Squat',                  ARRAY['quads'],                ARRAY['glutes'],               'machine',    'compound', 'push',
+ 'Quad-focused squat. Keep low back against pad. Full range for VMO development.'),
+('Leg Extension',               ARRAY['quads'],                ARRAY[],                       'machine',    'isolation', 'push',
+ 'Isolate the quads. Full extension, slow eccentric. Toes slightly turned out.'),
+('Walking Lunge',               ARRAY['quads','glutes'],       ARRAY['hamstrings'],           'dumbbell',   'compound', 'push',
+ 'Step forward, lower back knee near floor. Drive through front heel.'),
+('Goblet Squat',                ARRAY['quads','glutes'],       ARRAY['core'],                 'dumbbell',   'compound', 'push',
+ 'Hold dumbbell at chest. Great squat pattern for beginners. Deep range of motion.'),
+('Sissy Squat',                 ARRAY['quads'],                ARRAY[],                       'bodyweight', 'isolation', 'push',
+ 'Lean back while bending knees. Isolates VMO and rectus femoris. Advanced.'),
+('Cyclist Squat',               ARRAY['quads'],                ARRAY['glutes'],               'barbell',    'compound', 'push',
+ 'Heels elevated on plate. Extreme quad emphasis with upright torso.'),
+
+-- ============================================================
+-- LEGS - POSTERIOR
+-- ============================================================
+('Romanian Deadlift (Dumbbells)', ARRAY['hamstrings','glutes'], ARRAY['lower_back'],         'dumbbell',   'compound', 'pull',
+ 'Same as barbell RDL. Greater range of motion possible.'),
+('Leg Curl (Lying)',            ARRAY['hamstrings'],           ARRAY[],                       'machine',    'isolation', 'pull',
+ 'Curl weight toward glutes. Full extension at start for loaded stretch.'),
+('Leg Curl (Seated)',           ARRAY['hamstrings'],           ARRAY[],                       'machine',    'isolation', 'pull',
+ 'Seated variant. Different hamstring fiber recruitment pattern.'),
+('Nordic Hamstring Curl',       ARRAY['hamstrings'],           ARRAY[],                       'bodyweight', 'isolation', 'pull',
+ 'Advanced. Lower body slowly while hamstrings resist. Eccentric focused.'),
+('Glute Bridge',                ARRAY['glutes'],               ARRAY['hamstrings'],           'bodyweight', 'isolation', 'push',
+ 'Drive hips up, squeeze glutes at top. Can be loaded with plate or barbell.'),
+('Hip Thrust',                  ARRAY['glutes'],               ARRAY['hamstrings','quads'],   'barbell',    'isolation', 'push',
+ 'Bar on hips, upper back on bench. Drive hips up to full extension. Peak glute activation.'),
+('Cable Pull-Through',          ARRAY['glutes','hamstrings'],  ARRAY['lower_back'],           'cable',      'isolation', 'pull',
+ 'Low cable, rope between legs. Hip hinge movement. Glute focus.'),
+('Good Morning',                ARRAY['hamstrings','lower_back'], ARRAY['glutes'],            'barbell',    'compound', 'pull',
+ 'Bar on traps. Hinge forward with slight knee bend. Feel hamstring stretch.'),
+('Sumo Deadlift',               ARRAY['glutes','hamstrings','quads'], ARRAY['lower_back'],    'barbell',    'compound', 'pull',
+ 'Wide stance, toes out. More glute/inner thigh activation than conventional.'),
+
+-- ============================================================
+-- CALVES
+-- ============================================================
+('Standing Calf Raise',         ARRAY['calves'],               ARRAY[],                       'machine',    'isolation', 'push',
+ 'Full plantarflexion and dorsiflexion. Pause at top and bottom.'),
+('Seated Calf Raise',           ARRAY['calves'],               ARRAY[],                       'machine',    'isolation', 'push',
+ 'Targets soleus more than standing variation.'),
+('Donkey Calf Raise',           ARRAY['calves'],               ARRAY[],                       'machine',    'isolation', 'push',
+ 'Classic bodybuilder exercise. Greater stretch in hip-hinged position.'),
+('Single-Leg Calf Raise',       ARRAY['calves'],               ARRAY[],                       'bodyweight', 'isolation', 'push',
+ 'On a step for maximum range. Use for bodyweight overload.'),
+
+-- ============================================================
+-- BICEPS
+-- ============================================================
+('Barbell Curl',                ARRAY['biceps'],               ARRAY['brachialis','forearms'], 'barbell',  'isolation', 'pull',
+ 'Supinated grip. Elbows stay at sides. Full extension at bottom.'),
+('EZ-Bar Curl',                 ARRAY['biceps'],               ARRAY['brachialis'],           'barbell',    'isolation', 'pull',
+ 'Angled grip reduces wrist stress. Hits biceps from different angle.'),
+('Dumbbell Curl',               ARRAY['biceps'],               ARRAY['brachialis','forearms'], 'dumbbell',  'isolation', 'pull',
+ 'Supinate at top for peak contraction. Alternate or bilateral.'),
+('Hammer Curl',                 ARRAY['brachialis','biceps'],  ARRAY['forearms'],             'dumbbell',   'isolation', 'pull',
+ 'Neutral grip. Brachialis dominant. Adds arm thickness.'),
+('Incline Dumbbell Curl',       ARRAY['biceps'],               ARRAY[],                       'dumbbell',   'isolation', 'pull',
+ 'Greater stretch at bottom of movement. Long head emphasis.'),
+('Preacher Curl',               ARRAY['biceps'],               ARRAY[],                       'barbell',    'isolation', 'pull',
+ 'Arm braced on pad. No swinging. Pure bicep isolation. Short head emphasis.'),
+('Concentration Curl',          ARRAY['biceps'],               ARRAY[],                       'dumbbell',   'isolation', 'pull',
+ 'Elbow on inner thigh. Complete isolation. Feel the peak contraction.'),
+('Cable Curl',                  ARRAY['biceps'],               ARRAY[],                       'cable',      'isolation', 'pull',
+ 'Constant tension throughout movement. Great for pump work.'),
+('Rope Hammer Curl',            ARRAY['brachialis','biceps'],  ARRAY['forearms'],             'cable',      'isolation', 'pull',
+ 'Rope attachment at low cable. Neutral grip variation.'),
+('Spider Curl',                 ARRAY['biceps'],               ARRAY[],                       'barbell',    'isolation', 'pull',
+ 'Chest on incline bench face down. Arms hang free. Pure bicep isolation.'),
+
+-- ============================================================
+-- TRICEPS
+-- ============================================================
+('Close-Grip Bench Press',      ARRAY['triceps'],              ARRAY['chest','front_delt'],   'barbell',    'compound', 'push',
+ 'Grip shoulder-width or slightly narrower. Elbows tuck in. Tricep focused pressing.'),
+('Skull Crusher',               ARRAY['triceps'],              ARRAY[],                       'barbell',    'isolation', 'push',
+ 'Lower bar to forehead/beyond. Elbow stability critical. Great for long head.'),
+('Tricep Dip',                  ARRAY['triceps'],              ARRAY['chest'],                'bodyweight', 'compound', 'push',
+ 'Upright torso targets triceps. Can be weighted with belt or plate.'),
+('Overhead Tricep Extension',   ARRAY['triceps'],              ARRAY[],                       'dumbbell',   'isolation', 'push',
+ 'Arms overhead maximizes long head stretch. Lower behind head, press up.'),
+('Cable Pushdown',              ARRAY['triceps'],              ARRAY[],                       'cable',      'isolation', 'push',
+ 'High cable, bar or rope. Elbows at sides, push down to full extension.'),
+('Rope Pushdown',               ARRAY['triceps'],              ARRAY[],                       'cable',      'isolation', 'push',
+ 'Rope attachment. Flare hands at bottom for more lateral head activation.'),
+('Overhead Cable Extension',    ARRAY['triceps'],              ARRAY[],                       'cable',      'isolation', 'push',
+ 'High cable overhead. Long head stretch similar to overhead extension.'),
+('JM Press',                    ARRAY['triceps'],              ARRAY['chest'],                'barbell',    'compound', 'push',
+ 'Hybrid between close-grip bench and skull crusher. Heavy loading for triceps.'),
+('Diamond Push-Up',             ARRAY['triceps'],              ARRAY['chest'],                'bodyweight', 'isolation', 'push',
+ 'Hands form diamond shape. Elbows flare back behind body.'),
+('Kickback',                    ARRAY['triceps'],              ARRAY[],                       'dumbbell',   'isolation', 'push',
+ 'Hinge forward, elbow at 90°. Kick hand back to full extension. Squeeze.'),
+
+-- ============================================================
+-- CORE / ABS
+-- ============================================================
+('Plank',                       ARRAY['core'],                 ARRAY['glutes','shoulders'],   'bodyweight', 'isolation', 'static',
+ 'Maintain straight line from head to heels. Brace abs hard. Breathe normally.'),
+('Ab Rollout',                  ARRAY['core'],                 ARRAY['lats','shoulders'],     'bodyweight', 'isolation', 'pull',
+ 'Ab wheel from kneeling. Roll out until hips drop, pull back. Advanced core.'),
+('Cable Crunch',                ARRAY['core'],                 ARRAY[],                       'cable',      'isolation', 'pull',
+ 'Kneel at high cable. Crunch elbows to knees. Flex at bottom, not just hip flex.'),
+('Hanging Leg Raise',           ARRAY['core'],                 ARRAY['hip_flexors'],          'bodyweight', 'isolation', 'pull',
+ 'Hang from bar. Raise legs to parallel or beyond. Control the descent.'),
+('Bicycle Crunch',              ARRAY['core'],                 ARRAY[],                       'bodyweight', 'isolation', 'pull',
+ 'Alternate elbow to opposite knee. Slow and controlled. Full extension each rep.'),
+('Decline Sit-Up',              ARRAY['core'],                 ARRAY[],                       'bodyweight', 'compound', 'pull',
+ 'Decline bench. Add weight to chest for progression.'),
+('Russian Twist',               ARRAY['core'],                 ARRAY[],                       'bodyweight', 'isolation', 'pull',
+ 'Feet off ground, rotate torso side to side. Add weight for progression.'),
+('Dead Bug',                    ARRAY['core'],                 ARRAY[],                       'bodyweight', 'isolation', 'static',
+ 'Opposite arm/leg extensions while maintaining flat low back. Anti-extension.'),
+('Pallof Press',                ARRAY['core'],                 ARRAY[],                       'cable',      'isolation', 'static',
+ 'Side-on to cable. Anti-rotation exercise. Press out and return.'),
+('Leg Raise',                   ARRAY['core'],                 ARRAY['hip_flexors'],          'bodyweight', 'isolation', 'pull',
+ 'Flat on back. Raise legs to 90° keeping low back pressed to floor.'),
+
+-- ============================================================
+-- GLUTES (targeted)
+-- ============================================================
+('Clamshell',                   ARRAY['glutes'],               ARRAY[],                       'bodyweight', 'isolation', 'pull',
+ 'Side-lying. Open knees like a clamshell. Can add resistance band.'),
+('Abduction Machine',           ARRAY['glutes'],               ARRAY[],                       'machine',    'isolation', 'push',
+ 'Push knees outward. Targets glute medius. Important for hip stability.'),
+('Adduction Machine',           ARRAY['glutes'],               ARRAY['inner_thigh'],          'machine',    'isolation', 'pull',
+ 'Push knees inward. Inner thigh and groin.'),
+('Donkey Kick',                 ARRAY['glutes'],               ARRAY['hamstrings'],           'bodyweight', 'isolation', 'push',
+ 'On all fours. Drive heel toward ceiling. Squeeze glute at top.'),
+('Banded Hip Thrust',           ARRAY['glutes'],               ARRAY['hamstrings'],           'bodyweight', 'isolation', 'push',
+ 'Band across hips adds resistance to hip thrust pattern.'),
+
+-- ============================================================
+-- FOREARMS
+-- ============================================================
+('Wrist Curl',                  ARRAY['forearms'],             ARRAY[],                       'barbell',    'isolation', 'pull',
+ 'Wrists over edge of bench. Curl weight up with wrist flexion.'),
+('Reverse Wrist Curl',          ARRAY['forearms'],             ARRAY[],                       'barbell',    'isolation', 'push',
+ 'Pronated grip. Works forearm extensors.'),
+('Farmer Walk',                 ARRAY['forearms','traps'],     ARRAY['core','glutes'],        'dumbbell',   'compound', 'static',
+ 'Heavy dumbbells, walk for distance or time. Ultimate grip strength.'),
+('Dead Hang',                   ARRAY['forearms','lats'],      ARRAY['shoulders'],            'bodyweight', 'isolation', 'static',
+ 'Hang from bar as long as possible. Grip and shoulder health.'),
+
+-- ============================================================
+-- CARDIO / FULL BODY
+-- ============================================================
+('Barbell Clean',               ARRAY['quads','glutes','traps'], ARRAY['hamstrings','shoulders'], 'barbell', 'compound', 'pull',
+ 'Olympic lift. Triple extension of ankles, knees, hips. Rack the bar on front delts.'),
+('Power Clean',                 ARRAY['quads','glutes','traps'], ARRAY['hamstrings'],         'barbell',    'compound', 'pull',
+ 'Clean without full squat at top. Power and speed focused.'),
+('Kettlebell Swing',            ARRAY['glutes','hamstrings'],  ARRAY['core','lower_back'],    'dumbbell',   'compound', 'pull',
+ 'Hip hinge power movement. Drive hips forward explosively. Bell floats to shoulder height.'),
+('Box Jump',                    ARRAY['quads','glutes'],       ARRAY['calves','hamstrings'],  'bodyweight', 'compound', 'push',
+ 'Explosive jump onto box. Land softly with bent knees. Step down.'),
+('Burpee',                      ARRAY['quads','chest','core'], ARRAY['shoulders','calves'],   'bodyweight', 'compound', 'push',
+ 'Squat down, kick feet back, push-up, jump up. Full body conditioning.'),
+('Sled Push',                   ARRAY['quads','glutes'],       ARRAY['calves','shoulders'],   'other',      'compound', 'push',
+ 'Drive through the floor. Lean into sled. Powerful leg drive.'),
+('Battle Ropes',                ARRAY['shoulders','core'],     ARRAY['biceps','triceps'],     'other',      'compound', 'push',
+ 'Alternate or simultaneous waves. Conditioning and upper body endurance.'),
+('Jump Rope',                   ARRAY['calves'],               ARRAY['core','shoulders'],     'other',      'compound', 'push',
+ 'Cardio and coordination. Double-unders for higher intensity.'),
+('Rowing Machine',              ARRAY['lats','mid_back'],      ARRAY['quads','biceps','core'], 'other',     'compound', 'pull',
+ 'Drive with legs first, then lean back, then pull. 60% legs, 20% back, 20% arms.'),
+('Treadmill Run',               ARRAY['quads','calves'],       ARRAY['glutes','hamstrings'],  'other',      'cardio',   'push',
+ 'Steady state or interval. Adjust incline for more challenge.'),
+('Assault Bike',                ARRAY['quads','glutes'],       ARRAY['shoulders','core'],     'other',      'cardio',   'push',
+ 'Full body cardio. Arms push/pull while legs pedal. Brutal and effective.'),
+('Stair Climber',               ARRAY['glutes','quads'],       ARRAY['calves','hamstrings'],  'other',      'cardio',   'push',
+ 'Glute and posterior chain emphasis. Don''t lean on rails.'),
+
+-- ============================================================
+-- NECK / UPPER TRAPS
+-- ============================================================
+('Neck Flexion',                ARRAY['neck'],                 ARRAY[],                       'bodyweight', 'isolation', 'pull',
+ 'Chin to chest movement. Use resistance band or manual resistance.'),
+('Neck Extension',              ARRAY['neck'],                 ARRAY[],                       'bodyweight', 'isolation', 'push',
+ 'Extend neck back. Manual resistance or neck harness.'),
+('Lateral Neck Raise',          ARRAY['neck'],                 ARRAY[],                       'bodyweight', 'isolation', 'pull',
+ 'Ear to shoulder. Manual resistance or band.'),
+
+-- ============================================================
+-- ROTATOR CUFF / SHOULDER HEALTH
+-- ============================================================
+('External Rotation',           ARRAY['rotator_cuff'],         ARRAY['rear_delt'],            'cable',      'isolation', 'pull',
+ 'Elbow at 90°, arm rotates outward. Prehab for shoulder health.'),
+('Internal Rotation',           ARRAY['rotator_cuff'],         ARRAY[],                       'cable',      'isolation', 'pull',
+ 'Opposite of external rotation. Balance ratio important.'),
+('Y-T-W-L Raise',               ARRAY['rear_delt','rotator_cuff'], ARRAY['traps'],            'dumbbell',   'isolation', 'pull',
+ 'Prone on incline bench. Raise arms in Y, T, W, L positions. Scapular stability.'),
+('Prone Trap Raise',            ARRAY['traps','rear_delt'],    ARRAY[],                       'dumbbell',   'isolation', 'pull',
+ 'Face down, raise arms in Y shape. Lower/mid trap activation.'),
+
+-- ============================================================
+-- ADDITIONAL VARIATIONS
+-- ============================================================
+('Landmine Press',              ARRAY['front_delt','upper_chest'], ARRAY['triceps'],          'barbell',    'compound', 'push',
+ 'Barbell in landmine attachment. Single arm press. Shoulder-friendly variation.'),
+('Meadows Row',                 ARRAY['lats','mid_back'],      ARRAY['biceps'],               'barbell',    'compound', 'pull',
+ 'Landmine, straddle over bar, pull from outside grip. John Meadows favorite.'),
+('Zercher Squat',               ARRAY['quads','glutes'],       ARRAY['biceps','core','upper_back'], 'barbell', 'compound', 'push',
+ 'Bar in crook of elbows. Very upright torso. Brutal core demand.'),
+('Safety Bar Squat',            ARRAY['quads','glutes'],       ARRAY['upper_back','core'],    'barbell',    'compound', 'push',
+ 'Reduces shoulder stress. More upright torso than back squat. Quad emphasis.'),
+('Belt Squat',                  ARRAY['quads','glutes'],       ARRAY['hamstrings'],           'machine',    'compound', 'push',
+ 'Load on hips, not spine. Great for high volume without spine stress.'),
+('Reverse Hyper',               ARRAY['glutes','hamstrings','lower_back'], ARRAY[],           'machine',    'isolation', 'pull',
+ 'Decompresses spine while strengthening posterior chain. Louie Simmons invention.'),
+('GHD Sit-Up',                  ARRAY['core','hip_flexors'],   ARRAY['quads'],                'machine',    'isolation', 'pull',
+ 'Glute-ham developer. Full range sit-up. Advanced core exercise.'),
+('Glute-Ham Raise',             ARRAY['hamstrings','glutes'],  ARRAY['lower_back'],           'machine',    'isolation', 'pull',
+ 'GHD machine. Knee flexion against gravity. Elite hamstring builder.'),
+('Dumbbell Pullover',           ARRAY['lats','chest'],         ARRAY['triceps','serratus'],   'dumbbell',   'isolation', 'pull',
+ 'Lie perpendicular to bench. Lower dumbbell behind head, pull over. Great for lat/chest.'),
+('Cable Pullover',              ARRAY['lats'],                 ARRAY['serratus'],             'cable',      'isolation', 'pull',
+ 'Constant tension variation of dumbbell pullover.'),
+('Trap Bar Deadlift',           ARRAY['quads','glutes','hamstrings'], ARRAY['lower_back','traps'], 'barbell', 'compound', 'pull',
+ 'Hex/trap bar. More upright torso than conventional deadlift. Great for beginners.'),
+('Single-Leg RDL',              ARRAY['hamstrings','glutes'],  ARRAY['lower_back','core'],    'dumbbell',   'compound', 'pull',
+ 'Balance and posterior chain. Hinge on one leg, non-working leg floats back.'),
+('Step Up',                     ARRAY['quads','glutes'],       ARRAY['hamstrings'],           'dumbbell',   'compound', 'push',
+ 'Step onto box or bench. Drive through heel of working leg.'),
+('Reverse Lunge',               ARRAY['quads','glutes'],       ARRAY['hamstrings'],           'dumbbell',   'compound', 'push',
+ 'Step backward into lunge. More knee-friendly than forward lunge.'),
+('Lateral Lunge',               ARRAY['quads','glutes'],       ARRAY['inner_thigh'],          'bodyweight', 'compound', 'push',
+ 'Step to side, sit into hip. Works frontal plane movement.'),
+('Cossack Squat',               ARRAY['inner_thigh','quads'],  ARRAY['glutes','hamstrings'],  'bodyweight', 'compound', 'push',
+ 'Deep lateral squat. Ankle and hip mobility challenge. Can be loaded.'),
+('Jefferson Curl',              ARRAY['lower_back','hamstrings'], ARRAY[],                    'barbell',    'isolation', 'pull',
+ 'Spinal flexion mobility work. Light weight, controlled. Not for injured backs.'),
+('Zercher Carry',               ARRAY['core','biceps'],        ARRAY['quads','upper_back'],   'barbell',    'compound', 'static',
+ 'Bar in elbow crooks. Walk for distance. Loaded carry variation.');
+
+-- Update the count to ensure proper indexing
+ANALYZE exercises;

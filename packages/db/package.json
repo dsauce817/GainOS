@@ -1,0 +1,10 @@
+{
+  "name": "@gainos/db",
+  "version": "0.1.0",
+  "private": true,
+  "main": "./src/types.ts",
+  "types": "./src/types.ts",
+  "devDependencies": {
+    "typescript": "^5.4.0"
+  }
+}
