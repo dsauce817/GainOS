@@ -16,6 +16,8 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import { useAuthStore } from "../../store/auth";
 import { supabase } from "../../lib/supabase";
 import type { AIMessage, AIConversation } from "@gainos/db";
+import { Keyboard, TouchableWithoutFeedback } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const SUGGESTED_PROMPTS = [
   "How is my training this week?",
@@ -35,6 +37,8 @@ export default function CoachScreen() {
   const [conversations, setConversations] = useState<AIConversation[]>([]);
   const [showConversations, setShowConversations] = useState(false);
   const flatListRef = useRef<FlatList>(null);
+  const [headerHeight, setHeaderHeight] = useState(0);
+  const insets = useSafeAreaInsets();
 
   useEffect(() => {
     loadConversations();
@@ -142,82 +146,104 @@ export default function CoachScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.container} edges={["top"]}>
-      {/* Header */}
-      <View style={styles.header}>
-        <Pressable
-          style={styles.headerLeft}
-          onPress={() => setShowConversations(!showConversations)}
+      <SafeAreaView style={styles.container} edges={["top"]}>
+        {/* Header */}
+        <View
+          style={styles.header}
+          onLayout={(e) => setHeaderHeight(e.nativeEvent.layout.height)}
         >
-          <View style={styles.coachHeaderAvatar}>
-            <Ionicons name="sparkles" size={16} color="#818cf8" />
-          </View>
-          <View>
-            <Text style={styles.headerTitle}>GainOS Coach</Text>
-            <Text style={styles.headerSub}>
-              {isTyping ? "Typing..." : "AI Personal Trainer"}
-            </Text>
-          </View>
-        </Pressable>
-        <Pressable style={styles.newChatBtn} onPress={startNewConversation}>
-          <Ionicons name="add" size={20} color="#52525b" />
-        </Pressable>
-      </View>
-
-      {/* Conversation History Dropdown */}
-      {showConversations && (
-        <View style={styles.convDropdown}>
-          <Pressable style={styles.convNewItem} onPress={startNewConversation}>
-            <Text style={styles.convNewText}>New Conversation</Text>
+          <Pressable
+            style={styles.headerLeft}
+            onPress={() => setShowConversations(!showConversations)}
+          >
+            <View style={styles.coachHeaderAvatar}>
+              <Ionicons name="sparkles" size={16} color="#818cf8" />
+            </View>
+            <View>
+              <Text style={styles.headerTitle}>GainOS Coach</Text>
+              <Text style={styles.headerSub}>
+                {isTyping ? "Typing..." : "AI Personal Trainer"}
+              </Text>
+            </View>
           </Pressable>
-          {conversations.map((conv) => (
-            <Pressable
-              key={conv.id}
-              style={styles.convItem}
-              onPress={() => loadConversation(conv.id)}
-            >
-              <Text style={styles.convItemTitle} numberOfLines={1}>
-                {conv.title || "Chat"}
-              </Text>
-              <Text style={styles.convItemDate}>
-                {new Date(conv.updated_at).toLocaleDateString()}
-              </Text>
-            </Pressable>
-          ))}
+          <Pressable style={styles.newChatBtn} onPress={startNewConversation}>
+            <Ionicons name="add" size={20} color="#52525b" />
+          </Pressable>
         </View>
-      )}
 
-      {/* Messages or Empty State */}
-      {messages.length === 0 ? (
-        <View style={styles.emptyState}>
-          <View style={styles.emptyAvatar}>
-            <Ionicons name="sparkles" size={28} color="#818cf8" />
+        {showConversations && (
+          <Pressable
+            style={[styles.backdrop, { top: headerHeight + insets.top }]}
+            onPress={() => setShowConversations(false)}
+          />
+        )}
+
+        {/* Conversation History Dropdown */}
+        {showConversations && (
+         <View style={[styles.convDropdown, { top: headerHeight + insets.top }]}>
+            <Pressable style={styles.convNewItem} onPress={startNewConversation}>
+              <Text style={styles.convNewText}>New Conversation</Text>
+            </Pressable>
+
+            <FlatList
+              data={conversations.slice(0, 20)} // optional safety limit
+              keyExtractor={(item) => item.id}
+              style={{ maxHeight: 260 }}
+              showsVerticalScrollIndicator={false}
+              renderItem={({ item }) => (
+                <Pressable
+                  style={styles.convItem}
+                  onPress={() => loadConversation(item.id)}
+                >
+                  <Text style={styles.convItemTitle} numberOfLines={1}>
+                    {item.title || "Chat"}
+                  </Text>
+                  <Text style={styles.convItemDate}>
+                    {new Date(item.updated_at).toLocaleDateString()}
+                  </Text>
+                </Pressable>
+              )}
+            />
           </View>
-          <Text style={styles.emptyTitle}>Your AI Coach</Text>
-          <Text style={styles.emptySub}>
-            I know your workouts, progress, and goals.{"\n"}Ask me anything.
-          </Text>
-          <View style={styles.promptGrid}>
-            {SUGGESTED_PROMPTS.slice(0, 4).map((prompt, i) => (
-              <Pressable
-                key={i}
-                style={styles.promptCard}
-                onPress={() => sendMessage(prompt)}
-              >
-                <Text style={styles.promptText}>{prompt}</Text>
-              </Pressable>
-            ))}
-          </View>
-        </View>
-      ) : (
+        )}
+
+        {/* Messages or Empty State */}
         <FlatList
           ref={flatListRef}
           data={messages}
           renderItem={renderMessage}
           keyExtractor={(item) => item.id}
-          contentContainerStyle={styles.messageList}
+          style={{ flex: 1 }}
+          contentContainerStyle={{
+            flexGrow: 1,
+            padding: messages.length > 0 ? 16 : 0,
+          }}
           showsVerticalScrollIndicator={false}
-          onContentSizeChange={() => flatListRef.current?.scrollToEnd({ animated: false })}
+          keyboardDismissMode="on-drag"
+          keyboardShouldPersistTaps="handled"
+          ListEmptyComponent={
+            <View style={styles.emptyState}>
+              <View style={styles.emptyAvatar}>
+                <Ionicons name="sparkles" size={28} color="#818cf8" />
+              </View>
+              <Text style={styles.emptyTitle}>Your AI Coach</Text>
+              <Text style={styles.emptySub}>
+                I know your workouts, progress, and goals.{"\n"}Ask me anything.
+              </Text>
+
+              <View style={styles.promptGrid}>
+                {SUGGESTED_PROMPTS.slice(0, 6).map((prompt, i) => (
+                  <Pressable
+                    key={i}
+                    style={styles.promptCard}
+                    onPress={() => sendMessage(prompt)}
+                  >
+                    <Text style={styles.promptText}>{prompt}</Text>
+                  </Pressable>
+                ))}
+              </View>
+            </View>
+          }
           ListFooterComponent={
             isTyping ? (
               <View style={styles.bubbleRow}>
@@ -230,52 +256,53 @@ export default function CoachScreen() {
               </View>
             ) : null
           }
+          onContentSizeChange={() =>
+            flatListRef.current?.scrollToEnd({ animated: false })
+          }
         />
-      )}
 
-      {/* Quick prompts when chatting */}
-      {messages.length > 0 && !isTyping && (
-        <View style={styles.quickPrompts}>
-          {SUGGESTED_PROMPTS.slice(0, 3).map((prompt, i) => (
+        {/* Quick prompts when chatting */}
+        {messages.length > 0 && !isTyping && (
+          <View style={styles.quickPrompts}>
+            {SUGGESTED_PROMPTS.slice(0, 3).map((prompt, i) => (
+              <Pressable
+                key={i}
+                style={styles.quickPrompt}
+                onPress={() => sendMessage(prompt)}
+              >
+                <Text style={styles.quickPromptText} numberOfLines={1}>{prompt}</Text>
+              </Pressable>
+            ))}
+          </View>
+        )}
+
+        {/* Input */}
+        <KeyboardAvoidingView
+          behavior={Platform.OS === "ios" ? "padding" : undefined}
+        >
+          <View style={styles.inputRow}>
+            <TextInput
+              style={styles.input}
+              value={inputText}
+              onChangeText={setInputText}
+              placeholder="Ask your coach..."
+              placeholderTextColor="#3f3f46"
+              multiline
+              maxLength={500}
+              returnKeyType="send"
+              onSubmitEditing={() => sendMessage(inputText)}
+              blurOnSubmit
+            />
             <Pressable
-              key={i}
-              style={styles.quickPrompt}
-              onPress={() => sendMessage(prompt)}
+              style={[styles.sendBtn, (!inputText.trim() || isTyping) && styles.sendBtnDisabled]}
+              onPress={() => sendMessage(inputText)}
+              disabled={!inputText.trim() || isTyping}
             >
-              <Text style={styles.quickPromptText} numberOfLines={1}>{prompt}</Text>
+              <Ionicons name="arrow-up" size={18} color="#fff" />
             </Pressable>
-          ))}
-        </View>
-      )}
-
-      {/* Input */}
-      <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
-        keyboardVerticalOffset={Platform.OS === "ios" ? 88 : 0}
-      >
-        <View style={styles.inputRow}>
-          <TextInput
-            style={styles.input}
-            value={inputText}
-            onChangeText={setInputText}
-            placeholder="Ask your coach..."
-            placeholderTextColor="#3f3f46"
-            multiline
-            maxLength={500}
-            returnKeyType="send"
-            onSubmitEditing={() => sendMessage(inputText)}
-            blurOnSubmit
-          />
-          <Pressable
-            style={[styles.sendBtn, (!inputText.trim() || isTyping) && styles.sendBtnDisabled]}
-            onPress={() => sendMessage(inputText)}
-            disabled={!inputText.trim() || isTyping}
-          >
-            <Ionicons name="arrow-up" size={18} color="#fff" />
-          </Pressable>
-        </View>
-      </KeyboardAvoidingView>
-    </SafeAreaView>
+          </View>
+        </KeyboardAvoidingView>
+      </SafeAreaView>
   );
 }
 
@@ -284,8 +311,11 @@ function formatTime(dateString: string): string {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#0a0a0b" },
-
+container: {
+  flex: 1,
+  backgroundColor: "#0a0a0b",
+  position: "relative",
+},
   header: {
     flexDirection: "row",
     alignItems: "center",
@@ -317,12 +347,17 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
 
-  convDropdown: {
-    backgroundColor: "#111113",
-    borderBottomWidth: 1,
-    borderBottomColor: "rgba(255,255,255,0.06)",
-    maxHeight: 240,
-  },
+convDropdown: {
+  position: "absolute",
+  left: 0,
+  right: 0,
+  backgroundColor: "#111113",
+  maxHeight: 300,
+  zIndex: 100,
+  elevation: 20, // Android
+  borderBottomWidth: 1,
+  borderBottomColor: "rgba(255,255,255,0.06)",
+},
   convNewItem: { padding: 16, borderBottomWidth: 1, borderBottomColor: "rgba(255,255,255,0.05)" },
   convNewText: { color: "#6366f1", fontSize: 14, fontWeight: "600" },
   convItem: {
@@ -339,10 +374,9 @@ const styles = StyleSheet.create({
   emptyState: {
     flex: 1,
     alignItems: "center",
-    justifyContent: "center",
+    justifyContent: "flex-start",
     padding: 32,
     gap: 12,
-    paddingBottom: 100,
   },
   emptyAvatar: {
     width: 64,
@@ -420,7 +454,6 @@ const styles = StyleSheet.create({
     gap: 10,
     paddingHorizontal: 16,
     paddingVertical: 12,
-    paddingBottom: 100,
     borderTopWidth: 1,
     borderTopColor: "rgba(255,255,255,0.06)",
   },
@@ -446,4 +479,12 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   sendBtnDisabled: { opacity: 0.35 },
+  backdrop: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: "rgba(0,0,0,0.5)",
+    zIndex: 50,
+  },
 });
