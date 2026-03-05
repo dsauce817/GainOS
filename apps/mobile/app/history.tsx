@@ -2,11 +2,10 @@ import { View, Text, ScrollView, Pressable, StyleSheet, ActivityIndicator } from
 import { SafeAreaView } from "react-native-safe-area-context";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "../../lib/supabase";
-import { useAuthStore } from "../../store/auth";
+import { router } from "expo-router";
+import { supabase } from "../lib/supabase";
+import { useAuthStore } from "../store/auth";
 import type { Workout } from "@gainos/db";
-
-// ─── Helpers ─────────────────────────────────────────────────────────────────
 
 function formatDuration(seconds: number | null): string {
   if (!seconds) return "—";
@@ -26,7 +25,6 @@ function formatDate(dateStr: string): string {
   const date = new Date(dateStr);
   const now = new Date();
   const diffDays = Math.floor((now.getTime() - date.getTime()) / 86400000);
-
   if (diffDays === 0) return "Today";
   if (diffDays === 1) return "Yesterday";
   if (diffDays < 7) return date.toLocaleDateString("en-US", { weekday: "long" });
@@ -39,18 +37,12 @@ function getSectionLabel(dateStr: string): string {
   const startOfThisWeek = new Date(now);
   startOfThisWeek.setDate(now.getDate() - now.getDay());
   startOfThisWeek.setHours(0, 0, 0, 0);
-
   const startOfLastWeek = new Date(startOfThisWeek);
   startOfLastWeek.setDate(startOfLastWeek.getDate() - 7);
-
   if (date >= startOfThisWeek) return "This Week";
   if (date >= startOfLastWeek) return "Last Week";
-
-  const monthYear = date.toLocaleDateString("en-US", { month: "long", year: "numeric" });
-  return monthYear;
+  return date.toLocaleDateString("en-US", { month: "long", year: "numeric" });
 }
-
-// ─── Workout Card ─────────────────────────────────────────────────────────────
 
 function WorkoutCard({ workout }: { workout: Workout }) {
   return (
@@ -59,7 +51,6 @@ function WorkoutCard({ workout }: { workout: Workout }) {
         <Text style={styles.workoutName} numberOfLines={1}>{workout.name}</Text>
         <Text style={styles.workoutDate}>{formatDate(workout.started_at)}</Text>
       </View>
-
       <View style={styles.cardStats}>
         <View style={styles.stat}>
           <Ionicons name="time-outline" size={13} color="#6b7280" />
@@ -79,8 +70,6 @@ function WorkoutCard({ workout }: { workout: Workout }) {
     </Pressable>
   );
 }
-
-// ─── Screen ───────────────────────────────────────────────────────────────────
 
 export default function HistoryScreen() {
   const { user } = useAuthStore();
@@ -102,24 +91,25 @@ export default function HistoryScreen() {
     enabled: !!user,
   });
 
-  // Group workouts by section label
   const sections: { label: string; items: Workout[] }[] = [];
   for (const workout of workouts ?? []) {
     const label = getSectionLabel(workout.started_at);
     const existing = sections.find((s) => s.label === label);
-    if (existing) {
-      existing.items.push(workout);
-    } else {
-      sections.push({ label, items: [workout] });
-    }
+    if (existing) existing.items.push(workout);
+    else sections.push({ label, items: [workout] });
   }
 
   return (
     <SafeAreaView style={styles.container} edges={["top"]}>
       <View style={styles.header}>
+        <Pressable style={styles.backBtn} onPress={() => router.back()}>
+          <Ionicons name="chevron-back" size={24} color="#f4f4f5" />
+        </Pressable>
         <Text style={styles.title}>History</Text>
-        {workouts && workouts.length > 0 && (
+        {workouts && workouts.length > 0 ? (
           <Text style={styles.subtitle}>{workouts.length} workouts</Text>
+        ) : (
+          <View style={{ width: 60 }} />
         )}
       </View>
 
@@ -134,10 +124,7 @@ export default function HistoryScreen() {
           <Text style={styles.emptySubtitle}>Completed workouts will appear here</Text>
         </View>
       ) : (
-        <ScrollView
-          contentContainerStyle={styles.list}
-          showsVerticalScrollIndicator={false}
-        >
+        <ScrollView contentContainerStyle={styles.list} showsVerticalScrollIndicator={false}>
           {sections.map((section) => (
             <View key={section.label}>
               <Text style={styles.sectionLabel}>{section.label}</Text>
@@ -146,57 +133,30 @@ export default function HistoryScreen() {
               ))}
             </View>
           ))}
-          <View style={{ height: 100 }} />
+          <View style={{ height: 40 }} />
         </ScrollView>
       )}
     </SafeAreaView>
   );
 }
 
-// ─── Styles ───────────────────────────────────────────────────────────────────
-
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#0a0a0b",
-  },
+  container: { flex: 1, backgroundColor: "#0a0a0b" },
   header: {
     flexDirection: "row",
-    alignItems: "baseline",
+    alignItems: "center",
     justifyContent: "space-between",
-    paddingHorizontal: 20,
-    paddingTop: 8,
+    paddingHorizontal: 16,
+    paddingTop: 4,
     paddingBottom: 16,
   },
-  title: {
-    fontSize: 28,
-    fontWeight: "700",
-    color: "#f4f4f5",
-    letterSpacing: -0.5,
-  },
-  subtitle: {
-    fontSize: 14,
-    color: "#52525b",
-  },
-  centered: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 8,
-  },
-  emptyTitle: {
-    fontSize: 18,
-    fontWeight: "600",
-    color: "#52525b",
-    marginTop: 12,
-  },
-  emptySubtitle: {
-    fontSize: 14,
-    color: "#3f3f46",
-  },
-  list: {
-    paddingHorizontal: 16,
-  },
+  backBtn: { padding: 4 },
+  title: { fontSize: 20, fontWeight: "700", color: "#f4f4f5", letterSpacing: -0.3 },
+  subtitle: { fontSize: 13, color: "#52525b" },
+  centered: { flex: 1, alignItems: "center", justifyContent: "center", gap: 8 },
+  emptyTitle: { fontSize: 18, fontWeight: "600", color: "#52525b", marginTop: 12 },
+  emptySubtitle: { fontSize: 14, color: "#3f3f46" },
+  list: { paddingHorizontal: 16 },
   sectionLabel: {
     fontSize: 13,
     fontWeight: "600",
@@ -221,34 +181,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: 12,
   },
-  workoutName: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#f4f4f5",
-    flex: 1,
-  },
-  workoutDate: {
-    fontSize: 13,
-    color: "#52525b",
-    marginLeft: 8,
-  },
-  cardStats: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 12,
-  },
-  stat: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 5,
-  },
-  statValue: {
-    fontSize: 13,
-    color: "#71717a",
-  },
-  statDivider: {
-    width: 1,
-    height: 12,
-    backgroundColor: "#27272a",
-  },
+  workoutName: { fontSize: 16, fontWeight: "600", color: "#f4f4f5", flex: 1 },
+  workoutDate: { fontSize: 13, color: "#52525b", marginLeft: 8 },
+  cardStats: { flexDirection: "row", alignItems: "center", gap: 12 },
+  stat: { flexDirection: "row", alignItems: "center", gap: 5 },
+  statValue: { fontSize: 13, color: "#71717a" },
+  statDivider: { width: 1, height: 12, backgroundColor: "#27272a" },
 });

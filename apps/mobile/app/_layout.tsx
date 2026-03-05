@@ -57,20 +57,25 @@ export default function RootLayout() {
             <Stack.Screen name="(tabs)" />
             <Stack.Screen
               name="workout/active"
-              options={{ presentation: "fullScreenModal", animation: "slide_from_bottom" }}
+              options={{ animation: "slide_from_bottom" }}
             />
             <Stack.Screen
               name="workout/complete"
-              options={{ presentation: "fullScreenModal", animation: "fade" }}
+              options={{ animation: "fade" }}
             />
             <Stack.Screen
               name="exercise/[id]"
               options={{ animation: "slide_from_right" }}
             />
             <Stack.Screen
-              name="coach/index"
+              name="history"
               options={{ animation: "slide_from_right" }}
             />
+            <Stack.Screen
+              name="coach"
+              options={{ animation: "slide_from_right" }}
+            />
+
           </Stack>
         </QueryClientProvider>
       </SafeAreaProvider>

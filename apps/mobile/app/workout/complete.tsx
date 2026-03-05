@@ -19,7 +19,7 @@ import { router, useLocalSearchParams } from "expo-router";
 import * as Haptics from "expo-haptics";
 import { formatDuration, formatVolume, formatPRType } from "@gainos/utils";
 import type { WorkoutCelebration, PRResult, AchievementUnlock } from "@gainos/db";
-
+import { useWorkoutStore } from "../../store/workout";
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get("window");
 
 export default function WorkoutCompleteScreen() {
@@ -30,6 +30,7 @@ export default function WorkoutCompleteScreen() {
 
   const [currentPRIndex, setCurrentPRIndex] = useState(-1); // -1 = show summary
   const [showingAchievements, setShowingAchievements] = useState(false);
+  const { discardWorkout } = useWorkoutStore();
 
   const confettiParticles = useRef(
     Array.from({ length: 40 }, (_, i) => ({
@@ -43,6 +44,9 @@ export default function WorkoutCompleteScreen() {
 
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const scaleAnim = useRef(new Animated.Value(0.8)).current;
+  useEffect(() => {
+    discardWorkout();
+  }, []);
 
   useEffect(() => {
     // Entry animation

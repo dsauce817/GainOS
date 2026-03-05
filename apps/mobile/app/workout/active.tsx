@@ -129,27 +129,24 @@ export default function ActiveWorkoutScreen() {
           }))
       );
 
-      if (setsToInsert.length > 0) {
-        await supabase.from("workout_sets").insert(setsToInsert);
+      if (setsToInsert.length) {
+        const { error } = await supabase
+          .from("workout_sets")
+          .insert(setsToInsert);
+
+        if (error) throw error;
       }
 
       // Call complete-workout edge function for PR detection + achievements
-      const { data: { session } } = await supabase.auth.getSession();
-      const celebration = await fetch(
-        `${process.env.EXPO_PUBLIC_SUPABASE_URL}/functions/v1/complete-workout`,
-        {
-          method: "POST",
-          headers: {
-            "Authorization": `Bearer ${session?.access_token}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ workoutId: workout.id }),
-        }
-      ).then((r) => r.json());
+      const { data: celebration } = await supabase.functions.invoke("complete-workout", {
+        body: { workoutId: workout.id },
+      });
 
+
+      // Block the discard-guard useEffect from redirecting to tabs
+ 
       discardWorkout();
-
-      // Navigate to completion screen with celebration data
+      setSaving(false);
       router.replace({
         pathname: "/workout/complete",
         params: {
@@ -157,6 +154,7 @@ export default function ActiveWorkoutScreen() {
           celebration: JSON.stringify(celebration),
         },
       });
+
     } catch (err) {
       Alert.alert("Save failed", "Workout saved locally. Will sync when back online.");
       setSaving(false);
@@ -169,15 +167,20 @@ export default function ActiveWorkoutScreen() {
       "All progress will be lost.",
       [
         { text: "Keep Going", style: "cancel" },
-        { text: "Discard", style: "destructive", onPress: discardWorkout },
+        {
+          text: "Discard",
+          style: "destructive",
+          onPress: () => {
+            discardWorkout();
+            router.replace("/(tabs)");
+          },
+        },
       ]
     );
   };
 
-  if (!activeWorkout) {
-    router.replace("/(tabs)");
-    return null;
-  }
+  
+  if (!activeWorkout) return null;
 
   return (
     <SafeAreaView style={styles.container} edges={["bottom"]}>

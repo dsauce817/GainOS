@@ -1,8 +1,7 @@
 import { useEffect } from "react";
 import { Tabs, Redirect } from "expo-router";
-import { StyleSheet } from "react-native";
+import { StyleSheet, Text } from "react-native";
 import { BlurView } from "expo-blur";
-import { LinearGradient } from "expo-linear-gradient";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import Animated, {
   useSharedValue,
@@ -16,11 +15,15 @@ function AnimatedIcon({
   focusedName,
   focused,
   color,
+  label,
+  size = 26,
 }: {
   name: React.ComponentProps<typeof Ionicons>["name"];
   focusedName: React.ComponentProps<typeof Ionicons>["name"];
   focused: boolean;
   color: string;
+  label: string;
+  size?: number;
 }) {
   const scale = useSharedValue(1);
   const animStyle = useAnimatedStyle(() => ({
@@ -28,36 +31,13 @@ function AnimatedIcon({
   }));
 
   useEffect(() => {
-    scale.value = withSpring(focused ? 1.2 : 1, { damping: 12, stiffness: 280 });
+    scale.value = withSpring(focused ? 1.08 : 1, { damping: 12, stiffness: 280 });
   }, [focused]);
 
   return (
-    <Animated.View style={animStyle}>
-      <Ionicons name={focused ? focusedName : name} size={24} color={color} />
-    </Animated.View>
-  );
-}
-
-function StartButton({ focused }: { focused: boolean }) {
-  const scale = useSharedValue(1);
-  const animStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: scale.value }],
-  }));
-
-  useEffect(() => {
-    scale.value = withSpring(focused ? 0.93 : 1, { damping: 12, stiffness: 280 });
-  }, [focused]);
-
-  return (
-    <Animated.View style={[styles.startOuter, animStyle]}>
-      <LinearGradient
-        colors={focused ? ["#818cf8", "#6366f1"] : ["#252530", "#1a1a22"]}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
-        style={styles.startInner}
-      >
-        <Ionicons name="add" size={28} color={focused ? "#fff" : "#6b7280"} />
-      </LinearGradient>
+    <Animated.View style={[styles.iconWrapper, animStyle]}>
+      <Ionicons name={focused ? focusedName : name} size={size} color={color} />
+      <Text style={[styles.tabLabel, { color }]} numberOfLines={1}>{label}</Text>
     </Animated.View>
   );
 }
@@ -89,49 +69,53 @@ export default function TabLayout() {
               focusedName="home"
               focused={focused}
               color={color}
+              label="Home"
             />
           ),
         }}
       />
       <Tabs.Screen
-        name="history"
+        name="progress"
         options={{
           tabBarIcon: ({ focused, color }) => (
             <AnimatedIcon
-              name="time-outline"
-              focusedName="time"
+              name="stats-chart-outline"
+              focusedName="stats-chart"
               focused={focused}
               color={color}
+              label="Progress"
             />
           ),
         }}
       />
       <Tabs.Screen
-        name="start"
-        options={{
-          tabBarIcon: ({ focused }) => <StartButton focused={focused} />,
-        }}
-      />
-      <Tabs.Screen
-        name="routines"
-        options={{ href: null }}
-      />
-      <Tabs.Screen
-        name="coach"
+        name="workouts"
         options={{
           tabBarIcon: ({ focused, color }) => (
             <AnimatedIcon
-              name="sparkles-outline"
-              focusedName="sparkles"
+              name="add-circle-outline"
+              focusedName="add-circle"
               focused={focused}
               color={color}
+              label="Workouts"
+              size={28} 
             />
           ),
         }}
       />
       <Tabs.Screen
-        name="trophies"
-        options={{ href: null }}
+        name="exercises"
+        options={{
+          tabBarIcon: ({ focused, color }) => (
+            <AnimatedIcon
+              name="barbell-outline"
+              focusedName="barbell"
+              focused={focused}
+              color={color}
+              label="Exercises"
+            />
+          ),
+        }}
       />
       <Tabs.Screen
         name="profile"
@@ -142,10 +126,13 @@ export default function TabLayout() {
               focusedName="person"
               focused={focused}
               color={color}
+              label="Profile"
             />
           ),
         }}
       />
+      <Tabs.Screen name="routines" options={{ href: null }} />
+      <Tabs.Screen name="trophies" options={{ href: null }} />
     </Tabs>
   );
 }
@@ -156,25 +143,18 @@ const styles = StyleSheet.create({
     borderTopColor: "rgba(255,255,255,0.07)",
     borderTopWidth: 0.5,
     height: 88,
-    paddingBottom: 24,
+    paddingBottom: 20,
     paddingTop: 8,
     elevation: 0,
   },
-  startOuter: {
-    width: 54,
-    height: 54,
-    borderRadius: 27,
-    overflow: "hidden",
-    marginBottom: 8,
-    shadowColor: "#6366f1",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.45,
-    shadowRadius: 12,
-    elevation: 8,
-  },
-  startInner: {
-    flex: 1,
-    justifyContent: "center",
+  iconWrapper: {
     alignItems: "center",
+    gap: 3,
+    width: 64,
+  },
+  tabLabel: {
+    fontSize: 10,
+    fontWeight: "500",
+    letterSpacing: 0.2,
   },
 });

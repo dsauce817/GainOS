@@ -115,7 +115,7 @@ export default function HomeScreen() {
 
         {/* Recent Workouts */}
         {stats?.recentWorkouts && stats.recentWorkouts.length > 0 && (
-          <Section title="Recent Workouts">
+          <Section title="Recent Workouts" onSeeAll={() => router.push("/history")}>
             {stats.recentWorkouts.map((w: any) => (
               <WorkoutRow key={w.id} workout={w} />
             ))}
@@ -132,7 +132,7 @@ export default function HomeScreen() {
         )}
 
         {/* Start Workout CTA */}
-        <Pressable style={styles.startCTA} onPress={() => router.push("/(tabs)/start")}>
+        <Pressable style={styles.startCTA} onPress={() => router.push("/workouts")}>
           <LinearGradient
             colors={["#6366f1", "#8b5cf6"]}
             start={{ x: 0, y: 0 }}
@@ -162,10 +162,17 @@ function StatCard({ label, value, suffix, emoji, color }: any) {
   );
 }
 
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
+function Section({ title, children, onSeeAll }: { title: string; children: React.ReactNode; onSeeAll?: () => void }) {
   return (
     <View style={styles.section}>
-      <Text style={styles.sectionTitle}>{title}</Text>
+      <View style={styles.sectionHeader}>
+        <Text style={styles.sectionTitle}>{title}</Text>
+        {onSeeAll && (
+          <Pressable onPress={onSeeAll}>
+            <Text style={styles.seeAll}>See all</Text>
+          </Pressable>
+        )}
+      </View>
       {children}
     </View>
   );
@@ -310,7 +317,9 @@ const styles = StyleSheet.create({
   statSuffix: { fontSize: 11, color: "#6b7280", fontWeight: "500" },
   statLabel: { fontSize: 11, color: "#6b7280", textAlign: "center" },
   section: { paddingHorizontal: 20, gap: 12 },
+  sectionHeader: { flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
   sectionTitle: { fontSize: 17, fontWeight: "700", color: "#f9fafb", letterSpacing: -0.2 },
+  seeAll: { fontSize: 13, color: "#818cf8", fontWeight: "600" },
   muscleGrid: { flexDirection: "row", flexWrap: "wrap", gap: 8 },
   muscleChip: {
     flexDirection: "row",
