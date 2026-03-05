@@ -1,6 +1,10 @@
 -- GainOS Exercise Library Seed
 -- 220+ exercises covering all muscle groups
-
+DO $$ BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'exercises_name_key') THEN
+    ALTER TABLE exercises ADD CONSTRAINT exercises_name_key UNIQUE (name);
+  END IF;
+END $$;
 INSERT INTO exercises (name, muscle_groups, secondary_muscles, equipment, category, force, instructions) VALUES
 
 -- ============================================================
@@ -105,16 +109,16 @@ INSERT INTO exercises (name, muscle_groups, secondary_muscles, equipment, catego
 ('Bulgarian Split Squat',       ARRAY['quads','glutes'],       ARRAY['hamstrings'],           'dumbbell',   'compound', 'push',
  'Rear foot elevated. Front foot forward. Drop knee to floor. 2-3 inch front shin angle.'),
 ('Leg Press',                   ARRAY['quads','glutes'],       ARRAY['hamstrings'],           'machine',    'compound', 'push',
- 'Push through full range. Don't lock out knees. Foot position affects muscle emphasis.'),
+ 'Push through full range. Don''t lock out knees. Foot position affects muscle emphasis.'),
 ('Hack Squat',                  ARRAY['quads'],                ARRAY['glutes'],               'machine',    'compound', 'push',
  'Quad-focused squat. Keep low back against pad. Full range for VMO development.'),
-('Leg Extension',               ARRAY['quads'],                ARRAY[],                       'machine',    'isolation', 'push',
+('Leg Extension',               ARRAY['quads'],                ARRAY[]::text[],                       'machine',    'isolation', 'push',
  'Isolate the quads. Full extension, slow eccentric. Toes slightly turned out.'),
 ('Walking Lunge',               ARRAY['quads','glutes'],       ARRAY['hamstrings'],           'dumbbell',   'compound', 'push',
  'Step forward, lower back knee near floor. Drive through front heel.'),
 ('Goblet Squat',                ARRAY['quads','glutes'],       ARRAY['core'],                 'dumbbell',   'compound', 'push',
  'Hold dumbbell at chest. Great squat pattern for beginners. Deep range of motion.'),
-('Sissy Squat',                 ARRAY['quads'],                ARRAY[],                       'bodyweight', 'isolation', 'push',
+('Sissy Squat',                 ARRAY['quads'],                ARRAY[]::text[],                       'bodyweight', 'isolation', 'push',
  'Lean back while bending knees. Isolates VMO and rectus femoris. Advanced.'),
 ('Cyclist Squat',               ARRAY['quads'],                ARRAY['glutes'],               'barbell',    'compound', 'push',
  'Heels elevated on plate. Extreme quad emphasis with upright torso.'),
@@ -124,11 +128,11 @@ INSERT INTO exercises (name, muscle_groups, secondary_muscles, equipment, catego
 -- ============================================================
 ('Romanian Deadlift (Dumbbells)', ARRAY['hamstrings','glutes'], ARRAY['lower_back'],         'dumbbell',   'compound', 'pull',
  'Same as barbell RDL. Greater range of motion possible.'),
-('Leg Curl (Lying)',            ARRAY['hamstrings'],           ARRAY[],                       'machine',    'isolation', 'pull',
+('Leg Curl (Lying)',            ARRAY['hamstrings'],           ARRAY[]::text[],                       'machine',    'isolation', 'pull',
  'Curl weight toward glutes. Full extension at start for loaded stretch.'),
-('Leg Curl (Seated)',           ARRAY['hamstrings'],           ARRAY[],                       'machine',    'isolation', 'pull',
+('Leg Curl (Seated)',           ARRAY['hamstrings'],           ARRAY[]::text[],                       'machine',    'isolation', 'pull',
  'Seated variant. Different hamstring fiber recruitment pattern.'),
-('Nordic Hamstring Curl',       ARRAY['hamstrings'],           ARRAY[],                       'bodyweight', 'isolation', 'pull',
+('Nordic Hamstring Curl',       ARRAY['hamstrings'],           ARRAY[]::text[],                       'bodyweight', 'isolation', 'pull',
  'Advanced. Lower body slowly while hamstrings resist. Eccentric focused.'),
 ('Glute Bridge',                ARRAY['glutes'],               ARRAY['hamstrings'],           'bodyweight', 'isolation', 'push',
  'Drive hips up, squeeze glutes at top. Can be loaded with plate or barbell.'),
@@ -144,13 +148,13 @@ INSERT INTO exercises (name, muscle_groups, secondary_muscles, equipment, catego
 -- ============================================================
 -- CALVES
 -- ============================================================
-('Standing Calf Raise',         ARRAY['calves'],               ARRAY[],                       'machine',    'isolation', 'push',
+('Standing Calf Raise',         ARRAY['calves'],               ARRAY[]::text[],                       'machine',    'isolation', 'push',
  'Full plantarflexion and dorsiflexion. Pause at top and bottom.'),
-('Seated Calf Raise',           ARRAY['calves'],               ARRAY[],                       'machine',    'isolation', 'push',
+('Seated Calf Raise',           ARRAY['calves'],               ARRAY[]::text[],                       'machine',    'isolation', 'push',
  'Targets soleus more than standing variation.'),
-('Donkey Calf Raise',           ARRAY['calves'],               ARRAY[],                       'machine',    'isolation', 'push',
+('Donkey Calf Raise',           ARRAY['calves'],               ARRAY[]::text[],                       'machine',    'isolation', 'push',
  'Classic bodybuilder exercise. Greater stretch in hip-hinged position.'),
-('Single-Leg Calf Raise',       ARRAY['calves'],               ARRAY[],                       'bodyweight', 'isolation', 'push',
+('Single-Leg Calf Raise',       ARRAY['calves'],               ARRAY[]::text[],                       'bodyweight', 'isolation', 'push',
  'On a step for maximum range. Use for bodyweight overload.'),
 
 -- ============================================================
@@ -164,17 +168,17 @@ INSERT INTO exercises (name, muscle_groups, secondary_muscles, equipment, catego
  'Supinate at top for peak contraction. Alternate or bilateral.'),
 ('Hammer Curl',                 ARRAY['brachialis','biceps'],  ARRAY['forearms'],             'dumbbell',   'isolation', 'pull',
  'Neutral grip. Brachialis dominant. Adds arm thickness.'),
-('Incline Dumbbell Curl',       ARRAY['biceps'],               ARRAY[],                       'dumbbell',   'isolation', 'pull',
+('Incline Dumbbell Curl',       ARRAY['biceps'],               ARRAY[]::text[],                       'dumbbell',   'isolation', 'pull',
  'Greater stretch at bottom of movement. Long head emphasis.'),
-('Preacher Curl',               ARRAY['biceps'],               ARRAY[],                       'barbell',    'isolation', 'pull',
+('Preacher Curl',               ARRAY['biceps'],               ARRAY[]::text[],                       'barbell',    'isolation', 'pull',
  'Arm braced on pad. No swinging. Pure bicep isolation. Short head emphasis.'),
-('Concentration Curl',          ARRAY['biceps'],               ARRAY[],                       'dumbbell',   'isolation', 'pull',
+('Concentration Curl',          ARRAY['biceps'],               ARRAY[]::text[],                       'dumbbell',   'isolation', 'pull',
  'Elbow on inner thigh. Complete isolation. Feel the peak contraction.'),
-('Cable Curl',                  ARRAY['biceps'],               ARRAY[],                       'cable',      'isolation', 'pull',
+('Cable Curl',                  ARRAY['biceps'],               ARRAY[]::text[],                       'cable',      'isolation', 'pull',
  'Constant tension throughout movement. Great for pump work.'),
 ('Rope Hammer Curl',            ARRAY['brachialis','biceps'],  ARRAY['forearms'],             'cable',      'isolation', 'pull',
  'Rope attachment at low cable. Neutral grip variation.'),
-('Spider Curl',                 ARRAY['biceps'],               ARRAY[],                       'barbell',    'isolation', 'pull',
+('Spider Curl',                 ARRAY['biceps'],               ARRAY[]::text[],                       'barbell',    'isolation', 'pull',
  'Chest on incline bench face down. Arms hang free. Pure bicep isolation.'),
 
 -- ============================================================
@@ -182,23 +186,23 @@ INSERT INTO exercises (name, muscle_groups, secondary_muscles, equipment, catego
 -- ============================================================
 ('Close-Grip Bench Press',      ARRAY['triceps'],              ARRAY['chest','front_delt'],   'barbell',    'compound', 'push',
  'Grip shoulder-width or slightly narrower. Elbows tuck in. Tricep focused pressing.'),
-('Skull Crusher',               ARRAY['triceps'],              ARRAY[],                       'barbell',    'isolation', 'push',
+('Skull Crusher',               ARRAY['triceps'],              ARRAY[]::text[],                       'barbell',    'isolation', 'push',
  'Lower bar to forehead/beyond. Elbow stability critical. Great for long head.'),
 ('Tricep Dip',                  ARRAY['triceps'],              ARRAY['chest'],                'bodyweight', 'compound', 'push',
  'Upright torso targets triceps. Can be weighted with belt or plate.'),
-('Overhead Tricep Extension',   ARRAY['triceps'],              ARRAY[],                       'dumbbell',   'isolation', 'push',
+('Overhead Tricep Extension',   ARRAY['triceps'],              ARRAY[]::text[],                       'dumbbell',   'isolation', 'push',
  'Arms overhead maximizes long head stretch. Lower behind head, press up.'),
-('Cable Pushdown',              ARRAY['triceps'],              ARRAY[],                       'cable',      'isolation', 'push',
+('Cable Pushdown',              ARRAY['triceps'],              ARRAY[]::text[],                       'cable',      'isolation', 'push',
  'High cable, bar or rope. Elbows at sides, push down to full extension.'),
-('Rope Pushdown',               ARRAY['triceps'],              ARRAY[],                       'cable',      'isolation', 'push',
+('Rope Pushdown',               ARRAY['triceps'],              ARRAY[]::text[],                       'cable',      'isolation', 'push',
  'Rope attachment. Flare hands at bottom for more lateral head activation.'),
-('Overhead Cable Extension',    ARRAY['triceps'],              ARRAY[],                       'cable',      'isolation', 'push',
+('Overhead Cable Extension',    ARRAY['triceps'],              ARRAY[]::text[],                       'cable',      'isolation', 'push',
  'High cable overhead. Long head stretch similar to overhead extension.'),
 ('JM Press',                    ARRAY['triceps'],              ARRAY['chest'],                'barbell',    'compound', 'push',
  'Hybrid between close-grip bench and skull crusher. Heavy loading for triceps.'),
 ('Diamond Push-Up',             ARRAY['triceps'],              ARRAY['chest'],                'bodyweight', 'isolation', 'push',
  'Hands form diamond shape. Elbows flare back behind body.'),
-('Kickback',                    ARRAY['triceps'],              ARRAY[],                       'dumbbell',   'isolation', 'push',
+('Kickback',                    ARRAY['triceps'],              ARRAY[]::text[],                       'dumbbell',   'isolation', 'push',
  'Hinge forward, elbow at 90°. Kick hand back to full extension. Squeeze.'),
 
 -- ============================================================
@@ -208,19 +212,19 @@ INSERT INTO exercises (name, muscle_groups, secondary_muscles, equipment, catego
  'Maintain straight line from head to heels. Brace abs hard. Breathe normally.'),
 ('Ab Rollout',                  ARRAY['core'],                 ARRAY['lats','shoulders'],     'bodyweight', 'isolation', 'pull',
  'Ab wheel from kneeling. Roll out until hips drop, pull back. Advanced core.'),
-('Cable Crunch',                ARRAY['core'],                 ARRAY[],                       'cable',      'isolation', 'pull',
+('Cable Crunch',                ARRAY['core'],                 ARRAY[]::text[],                       'cable',      'isolation', 'pull',
  'Kneel at high cable. Crunch elbows to knees. Flex at bottom, not just hip flex.'),
 ('Hanging Leg Raise',           ARRAY['core'],                 ARRAY['hip_flexors'],          'bodyweight', 'isolation', 'pull',
  'Hang from bar. Raise legs to parallel or beyond. Control the descent.'),
-('Bicycle Crunch',              ARRAY['core'],                 ARRAY[],                       'bodyweight', 'isolation', 'pull',
+('Bicycle Crunch',              ARRAY['core'],                 ARRAY[]::text[],                       'bodyweight', 'isolation', 'pull',
  'Alternate elbow to opposite knee. Slow and controlled. Full extension each rep.'),
-('Decline Sit-Up',              ARRAY['core'],                 ARRAY[],                       'bodyweight', 'compound', 'pull',
+('Decline Sit-Up',              ARRAY['core'],                 ARRAY[]::text[],                       'bodyweight', 'compound', 'pull',
  'Decline bench. Add weight to chest for progression.'),
-('Russian Twist',               ARRAY['core'],                 ARRAY[],                       'bodyweight', 'isolation', 'pull',
+('Russian Twist',               ARRAY['core'],                 ARRAY[]::text[],                       'bodyweight', 'isolation', 'pull',
  'Feet off ground, rotate torso side to side. Add weight for progression.'),
-('Dead Bug',                    ARRAY['core'],                 ARRAY[],                       'bodyweight', 'isolation', 'static',
+('Dead Bug',                    ARRAY['core'],                 ARRAY[]::text[],                       'bodyweight', 'isolation', 'static',
  'Opposite arm/leg extensions while maintaining flat low back. Anti-extension.'),
-('Pallof Press',                ARRAY['core'],                 ARRAY[],                       'cable',      'isolation', 'static',
+('Pallof Press',                ARRAY['core'],                 ARRAY[]::text[],                       'cable',      'isolation', 'static',
  'Side-on to cable. Anti-rotation exercise. Press out and return.'),
 ('Leg Raise',                   ARRAY['core'],                 ARRAY['hip_flexors'],          'bodyweight', 'isolation', 'pull',
  'Flat on back. Raise legs to 90° keeping low back pressed to floor.'),
@@ -228,9 +232,9 @@ INSERT INTO exercises (name, muscle_groups, secondary_muscles, equipment, catego
 -- ============================================================
 -- GLUTES (targeted)
 -- ============================================================
-('Clamshell',                   ARRAY['glutes'],               ARRAY[],                       'bodyweight', 'isolation', 'pull',
+('Clamshell',                   ARRAY['glutes'],               ARRAY[]::text[],                       'bodyweight', 'isolation', 'pull',
  'Side-lying. Open knees like a clamshell. Can add resistance band.'),
-('Abduction Machine',           ARRAY['glutes'],               ARRAY[],                       'machine',    'isolation', 'push',
+('Abduction Machine',           ARRAY['glutes'],               ARRAY[]::text[],                       'machine',    'isolation', 'push',
  'Push knees outward. Targets glute medius. Important for hip stability.'),
 ('Adduction Machine',           ARRAY['glutes'],               ARRAY['inner_thigh'],          'machine',    'isolation', 'pull',
  'Push knees inward. Inner thigh and groin.'),
@@ -242,9 +246,9 @@ INSERT INTO exercises (name, muscle_groups, secondary_muscles, equipment, catego
 -- ============================================================
 -- FOREARMS
 -- ============================================================
-('Wrist Curl',                  ARRAY['forearms'],             ARRAY[],                       'barbell',    'isolation', 'pull',
+('Wrist Curl',                  ARRAY['forearms'],             ARRAY[]::text[],                       'barbell',    'isolation', 'pull',
  'Wrists over edge of bench. Curl weight up with wrist flexion.'),
-('Reverse Wrist Curl',          ARRAY['forearms'],             ARRAY[],                       'barbell',    'isolation', 'push',
+('Reverse Wrist Curl',          ARRAY['forearms'],             ARRAY[]::text[],                       'barbell',    'isolation', 'push',
  'Pronated grip. Works forearm extensors.'),
 ('Farmer Walk',                 ARRAY['forearms','traps'],     ARRAY['core','glutes'],        'dumbbell',   'compound', 'static',
  'Heavy dumbbells, walk for distance or time. Ultimate grip strength.'),
@@ -282,11 +286,11 @@ INSERT INTO exercises (name, muscle_groups, secondary_muscles, equipment, catego
 -- ============================================================
 -- NECK / UPPER TRAPS
 -- ============================================================
-('Neck Flexion',                ARRAY['neck'],                 ARRAY[],                       'bodyweight', 'isolation', 'pull',
+('Neck Flexion',                ARRAY['neck'],                 ARRAY[]::text[],                       'bodyweight', 'isolation', 'pull',
  'Chin to chest movement. Use resistance band or manual resistance.'),
-('Neck Extension',              ARRAY['neck'],                 ARRAY[],                       'bodyweight', 'isolation', 'push',
+('Neck Extension',              ARRAY['neck'],                 ARRAY[]::text[],                       'bodyweight', 'isolation', 'push',
  'Extend neck back. Manual resistance or neck harness.'),
-('Lateral Neck Raise',          ARRAY['neck'],                 ARRAY[],                       'bodyweight', 'isolation', 'pull',
+('Lateral Neck Raise',          ARRAY['neck'],                 ARRAY[]::text[],                       'bodyweight', 'isolation', 'pull',
  'Ear to shoulder. Manual resistance or band.'),
 
 -- ============================================================
@@ -294,11 +298,11 @@ INSERT INTO exercises (name, muscle_groups, secondary_muscles, equipment, catego
 -- ============================================================
 ('External Rotation',           ARRAY['rotator_cuff'],         ARRAY['rear_delt'],            'cable',      'isolation', 'pull',
  'Elbow at 90°, arm rotates outward. Prehab for shoulder health.'),
-('Internal Rotation',           ARRAY['rotator_cuff'],         ARRAY[],                       'cable',      'isolation', 'pull',
+('Internal Rotation',           ARRAY['rotator_cuff'],         ARRAY[]::text[],                       'cable',      'isolation', 'pull',
  'Opposite of external rotation. Balance ratio important.'),
 ('Y-T-W-L Raise',               ARRAY['rear_delt','rotator_cuff'], ARRAY['traps'],            'dumbbell',   'isolation', 'pull',
  'Prone on incline bench. Raise arms in Y, T, W, L positions. Scapular stability.'),
-('Prone Trap Raise',            ARRAY['traps','rear_delt'],    ARRAY[],                       'dumbbell',   'isolation', 'pull',
+('Prone Trap Raise',            ARRAY['traps','rear_delt'],    ARRAY[]::text[],                       'dumbbell',   'isolation', 'pull',
  'Face down, raise arms in Y shape. Lower/mid trap activation.'),
 
 -- ============================================================
@@ -314,7 +318,7 @@ INSERT INTO exercises (name, muscle_groups, secondary_muscles, equipment, catego
  'Reduces shoulder stress. More upright torso than back squat. Quad emphasis.'),
 ('Belt Squat',                  ARRAY['quads','glutes'],       ARRAY['hamstrings'],           'machine',    'compound', 'push',
  'Load on hips, not spine. Great for high volume without spine stress.'),
-('Reverse Hyper',               ARRAY['glutes','hamstrings','lower_back'], ARRAY[],           'machine',    'isolation', 'pull',
+('Reverse Hyper',               ARRAY['glutes','hamstrings','lower_back'], ARRAY[]::text[],           'machine',    'isolation', 'pull',
  'Decompresses spine while strengthening posterior chain. Louie Simmons invention.'),
 ('GHD Sit-Up',                  ARRAY['core','hip_flexors'],   ARRAY['quads'],                'machine',    'isolation', 'pull',
  'Glute-ham developer. Full range sit-up. Advanced core exercise.'),
@@ -336,10 +340,11 @@ INSERT INTO exercises (name, muscle_groups, secondary_muscles, equipment, catego
  'Step to side, sit into hip. Works frontal plane movement.'),
 ('Cossack Squat',               ARRAY['inner_thigh','quads'],  ARRAY['glutes','hamstrings'],  'bodyweight', 'compound', 'push',
  'Deep lateral squat. Ankle and hip mobility challenge. Can be loaded.'),
-('Jefferson Curl',              ARRAY['lower_back','hamstrings'], ARRAY[],                    'barbell',    'isolation', 'pull',
+('Jefferson Curl',              ARRAY['lower_back','hamstrings'], ARRAY[]::text[],                    'barbell',    'isolation', 'pull',
  'Spinal flexion mobility work. Light weight, controlled. Not for injured backs.'),
 ('Zercher Carry',               ARRAY['core','biceps'],        ARRAY['quads','upper_back'],   'barbell',    'compound', 'static',
- 'Bar in elbow crooks. Walk for distance. Loaded carry variation.');
+ 'Bar in elbow crooks. Walk for distance. Loaded carry variation.')
+ON CONFLICT (name) DO NOTHING;
 
 -- Update the count to ensure proper indexing
 ANALYZE exercises;
