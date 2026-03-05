@@ -4,22 +4,7 @@ import { useLocalSearchParams, router } from "expo-router";
 import { useQuery } from "@tanstack/react-query";
 import { useAuthStore } from "../../store/auth";
 import { supabase } from "../../lib/supabase";
-
-const MUSCLE_COLORS: Record<string, string> = {
-  chest: "#ef4444",
-  back: "#3b82f6",
-  shoulders: "#8b5cf6",
-  biceps: "#f59e0b",
-  triceps: "#f97316",
-  legs: "#22c55e",
-  quads: "#22c55e",
-  hamstrings: "#16a34a",
-  glutes: "#15803d",
-  calves: "#4ade80",
-  core: "#06b6d4",
-  abs: "#06b6d4",
-  forearms: "#d97706",
-};
+import { Colors, MuscleColors } from "../../constants/theme";
 
 export default function ExerciseDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -114,10 +99,10 @@ export default function ExerciseDetailScreen() {
                 key={m}
                 style={[
                   styles.muscleChip,
-                  { backgroundColor: `${MUSCLE_COLORS[m] || "#6366f1"}22`, borderColor: MUSCLE_COLORS[m] || "#6366f1" },
+                  { backgroundColor: `${MuscleColors[m] || Colors.accent}22`, borderColor: MuscleColors[m] || Colors.accent },
                 ]}
               >
-                <Text style={[styles.muscleChipText, { color: MUSCLE_COLORS[m] || "#6366f1" }]}>
+                <Text style={[styles.muscleChipText, { color: MuscleColors[m] || Colors.accent }]}>
                   {m.replace(/_/g, " ")}
                 </Text>
               </View>
@@ -204,27 +189,27 @@ function Tag({ text }: { text: string }) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#0a0a0b" },
+  container: { flex: 1, backgroundColor: Colors.bg },
   loading: { flex: 1, alignItems: "center", justifyContent: "center" },
   loadingText: { color: "#6b7280" },
   header: { paddingHorizontal: 20, paddingTop: 8 },
   backBtn: { paddingVertical: 8 },
-  backText: { color: "#6366f1", fontSize: 18, fontWeight: "600" },
+  backText: { color: Colors.accent, fontSize: 18, fontWeight: "600" },
   content: { padding: 20, gap: 24, paddingBottom: 60 },
   titleSection: { gap: 12 },
-  title: { fontSize: 28, fontWeight: "900", color: "#f9fafb", letterSpacing: -0.5 },
+  title: { fontSize: 28, fontWeight: "900", color: Colors.textBright, letterSpacing: -0.5 },
   tags: { flexDirection: "row", gap: 8 },
   tag: {
-    backgroundColor: "#1e1e24",
+    backgroundColor: Colors.bgModal,
     paddingHorizontal: 12,
     paddingVertical: 5,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: "#2a2a32",
+    borderColor: Colors.borderMid,
   },
   tagText: { color: "#9ca3af", fontSize: 12, fontWeight: "500", textTransform: "capitalize" },
   section: { gap: 12 },
-  sectionTitle: { fontSize: 18, fontWeight: "700", color: "#f9fafb" },
+  sectionTitle: { fontSize: 18, fontWeight: "700", color: Colors.textBright },
   muscleRow: { flexDirection: "row", flexWrap: "wrap", gap: 8 },
   muscleChip: {
     paddingHorizontal: 12,
@@ -238,52 +223,52 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     borderRadius: 100,
     borderWidth: 1,
-    borderColor: "#2a2a32",
-    backgroundColor: "#111113",
+    borderColor: Colors.borderMid,
+    backgroundColor: Colors.bgCard,
   },
   secondaryChipText: { fontSize: 13, color: "#6b7280", textTransform: "capitalize" },
   prGrid: { flexDirection: "row", flexWrap: "wrap", gap: 12 },
   prCard: {
     flex: 1,
     minWidth: "45%",
-    backgroundColor: "#0d1a0d",
+    backgroundColor: Colors.successBg,
     borderRadius: 14,
     padding: 16,
     borderWidth: 1,
-    borderColor: "#14532d",
+    borderColor: Colors.successBgBorder,
     alignItems: "center",
     gap: 4,
   },
-  prValue: { fontSize: 22, fontWeight: "800", color: "#4ade80" },
-  prLabel: { fontSize: 12, color: "#86efac", fontWeight: "500" },
+  prValue: { fontSize: 22, fontWeight: "800", color: Colors.successLight },
+  prLabel: { fontSize: 12, color: Colors.successBright, fontWeight: "500" },
   instructionsCard: {
-    backgroundColor: "#111113",
+    backgroundColor: Colors.bgCard,
     borderRadius: 14,
     padding: 16,
     borderWidth: 1,
-    borderColor: "#2a2a32",
+    borderColor: Colors.borderMid,
   },
   instructionsText: { color: "#d1d5db", fontSize: 14, lineHeight: 22 },
   tipsCard: {
-    backgroundColor: "#1c1a0a",
+    backgroundColor: Colors.warningBg,
     borderRadius: 14,
     padding: 16,
     borderWidth: 1,
-    borderColor: "#ca8a04",
+    borderColor: Colors.warning,
   },
-  tipsText: { color: "#fbbf24", fontSize: 14, lineHeight: 22 },
+  tipsText: { color: Colors.warningLight, fontSize: 14, lineHeight: 22 },
   historyRow: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    backgroundColor: "#111113",
+    backgroundColor: Colors.bgCard,
     borderRadius: 12,
     padding: 14,
     borderWidth: 1,
-    borderColor: "#2a2a32",
+    borderColor: Colors.borderMid,
   },
-  historyWeight: { fontSize: 15, fontWeight: "600", color: "#f9fafb" },
+  historyWeight: { fontSize: 15, fontWeight: "600", color: Colors.textBright },
   historyMeta: { fontSize: 12, color: "#6b7280", marginTop: 2 },
-  prBadge: { backgroundColor: "#16a34a", paddingHorizontal: 8, paddingVertical: 4, borderRadius: 6 },
+  prBadge: { backgroundColor: Colors.successBorder, paddingHorizontal: 8, paddingVertical: 4, borderRadius: 6 },
   prBadgeText: { color: "#fff", fontSize: 11, fontWeight: "800" },
 });

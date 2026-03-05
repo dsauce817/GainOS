@@ -5,6 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useAuthStore } from "../../store/auth";
 import { supabase } from "../../lib/supabase";
 import type { AchievementDefinition } from "@gainos/db";
+import { Colors } from "../../constants/theme";
 
 export default function ProfileScreen() {
   const { profile, signOut } = useAuthStore();
@@ -89,7 +90,7 @@ export default function ProfileScreen() {
 
         {/* Avatar */}
         <LinearGradient
-          colors={["#818cf8", "#6366f1", "#8b5cf6"]}
+          colors={[Colors.accentLight, Colors.accent, Colors.accentStrong]}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
           style={styles.avatarRing}
@@ -130,7 +131,7 @@ export default function ProfileScreen() {
         {/* Progress bar */}
         <View style={styles.progressTrack}>
           <LinearGradient
-            colors={["#6366f1", "#8b5cf6"]}
+            colors={[Colors.accent, Colors.accentStrong]}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 0 }}
             style={[styles.progressFill, { width: `${earnedPct}%` }]}
@@ -228,13 +229,13 @@ function AchievementBadge({
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#0a0a0b" },
+  container: { flex: 1, backgroundColor: Colors.bg },
   content: { paddingHorizontal: 20, paddingTop: 8, paddingBottom: 120, gap: 16, alignItems: "center" },
 
   title: {
     fontSize: 32,
     fontWeight: "800",
-    color: "#f4f4f5",
+    color: Colors.textPrimary,
     letterSpacing: -1,
     alignSelf: "flex-start",
     paddingTop: 8,
@@ -245,7 +246,7 @@ const styles = StyleSheet.create({
     borderRadius: 44,
     padding: 3,
     marginTop: 8,
-    shadowColor: "#6366f1",
+    shadowColor: Colors.accent,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.35,
     shadowRadius: 14,
@@ -254,20 +255,20 @@ const styles = StyleSheet.create({
   avatar: {
     flex: 1,
     borderRadius: 41,
-    backgroundColor: "#1e1e24",
+    backgroundColor: Colors.bgModal,
     alignItems: "center",
     justifyContent: "center",
   },
   avatarText: { fontSize: 32, fontWeight: "800", color: "#fff" },
-  name: { fontSize: 20, fontWeight: "700", color: "#f4f4f5", marginTop: 4 },
-  goalText: { fontSize: 13, color: "#818cf8", fontWeight: "600", textTransform: "capitalize", marginTop: -6 },
+  name: { fontSize: 20, fontWeight: "700", color: Colors.textPrimary, marginTop: 4 },
+  goalText: { fontSize: 13, color: Colors.accentLight, fontWeight: "600", textTransform: "capitalize", marginTop: -6 },
 
   card: {
     width: "100%",
-    backgroundColor: "#111113",
+    backgroundColor: Colors.bgCard,
     borderRadius: 14,
     borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.07)",
+    borderColor: Colors.borderSubtle,
     overflow: "hidden",
   },
   row: {
@@ -277,9 +278,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 14,
   },
-  rowDivider: { borderBottomWidth: 1, borderBottomColor: "rgba(255,255,255,0.05)" },
-  rowLabel: { fontSize: 14, color: "#52525b" },
-  rowValue: { fontSize: 14, fontWeight: "600", color: "#f4f4f5", textTransform: "capitalize" },
+  rowDivider: { borderBottomWidth: 1, borderBottomColor: Colors.borderFaint },
+  rowLabel: { fontSize: 14, color: Colors.textMuted },
+  rowValue: { fontSize: 14, fontWeight: "600", color: Colors.textPrimary, textTransform: "capitalize" },
 
   sectionHeader: {
     flexDirection: "row",
@@ -292,11 +293,11 @@ const styles = StyleSheet.create({
   sectionLabel: {
     fontSize: 11,
     fontWeight: "600",
-    color: "#52525b",
+    color: Colors.textMuted,
     letterSpacing: 1.2,
     textTransform: "uppercase",
   },
-  sectionCount: { fontSize: 13, fontWeight: "600", color: "#52525b" },
+  sectionCount: { fontSize: 13, fontWeight: "600", color: Colors.textMuted },
 
   progressTrack: {
     width: "100%",
@@ -311,7 +312,7 @@ const styles = StyleSheet.create({
   subSectionLabel: {
     fontSize: 11,
     fontWeight: "600",
-    color: "#3f3f46",
+    color: Colors.textFaint,
     letterSpacing: 1.2,
     textTransform: "uppercase",
     paddingHorizontal: 2,
@@ -321,7 +322,7 @@ const styles = StyleSheet.create({
   prCard: {
     flex: 1,
     minWidth: "45%",
-    backgroundColor: "#111113",
+    backgroundColor: Colors.bgCard,
     borderRadius: 12,
     padding: 14,
     gap: 4,
@@ -331,30 +332,30 @@ const styles = StyleSheet.create({
   prCardType: {
     fontSize: 10,
     fontWeight: "700",
-    color: "#22c55e",
+    color: Colors.success,
     textTransform: "uppercase",
     letterSpacing: 0.8,
   },
-  prCardExercise: { fontSize: 13, fontWeight: "600", color: "#f4f4f5" },
-  prCardValue: { fontSize: 20, fontWeight: "800", color: "#4ade80" },
+  prCardExercise: { fontSize: 13, fontWeight: "600", color: Colors.textPrimary },
+  prCardValue: { fontSize: 20, fontWeight: "800", color: Colors.successLight },
 
   achievementGrid: { flexDirection: "row", flexWrap: "wrap", gap: 10 },
   badge: {
     width: "47%",
-    backgroundColor: "#111113",
+    backgroundColor: Colors.bgCard,
     borderRadius: 14,
     padding: 14,
     gap: 6,
     borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.07)",
+    borderColor: Colors.borderSubtle,
   },
   badgeLocked: { opacity: 0.45 },
   badgeIcon: { fontSize: 28 },
   badgeIconLocked: { opacity: 0.5 },
-  badgeName: { fontSize: 13, fontWeight: "600", color: "#f4f4f5" },
-  badgeNameLocked: { color: "#52525b" },
+  badgeName: { fontSize: 13, fontWeight: "600", color: Colors.textPrimary },
+  badgeNameLocked: { color: Colors.textMuted },
   badgeXP: { fontSize: 11, fontWeight: "700" },
-  badgeDesc: { fontSize: 11, color: "#3f3f46", lineHeight: 15 },
+  badgeDesc: { fontSize: 11, color: Colors.textFaint, lineHeight: 15 },
 
   signOutBtn: {
     width: "100%",
@@ -366,5 +367,5 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginTop: 8,
   },
-  signOutText: { color: "#f87171", fontSize: 15, fontWeight: "600" },
+  signOutText: { color: Colors.errorLight, fontSize: 15, fontWeight: "600" },
 });

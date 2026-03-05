@@ -9,6 +9,7 @@ import Animated, {
   withSpring,
 } from "react-native-reanimated";
 import { useAuthStore } from "../../store/auth";
+import { Colors } from "../../constants/theme";
 
 function AnimatedIcon({
   name,
@@ -51,7 +52,7 @@ export default function TabLayout() {
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: "#818cf8",
+        tabBarActiveTintColor: Colors.accentLight,
         tabBarInactiveTintColor: "#4b5563",
         tabBarShowLabel: false,
         tabBarStyle: styles.tabBar,
@@ -98,7 +99,7 @@ export default function TabLayout() {
               focused={focused}
               color={color}
               label="Workouts"
-              size={28} 
+              size={28}
             />
           ),
         }}
@@ -140,7 +141,7 @@ export default function TabLayout() {
 const styles = StyleSheet.create({
   tabBar: {
     backgroundColor: "transparent",
-    borderTopColor: "rgba(255,255,255,0.07)",
+    borderTopColor: Colors.borderSubtle,
     borderTopWidth: 0.5,
     height: 88,
     paddingBottom: 20,

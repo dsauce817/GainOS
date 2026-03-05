@@ -1,7 +1,7 @@
 // GainOS Active Workout Screen
 // The core logging experience — exercises, sets, rest timer, RPE
 
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   View,
   Text,
@@ -22,8 +22,9 @@ import * as Haptics from "expo-haptics";
 import { useWorkoutStore } from "../../store/workout";
 import { useAuthStore } from "../../store/auth";
 import { supabase } from "../../lib/supabase";
-import { formatDuration, estimated1RM, formatWeight } from "@gainos/utils";
+import { formatDuration } from "@gainos/utils";
 import type { ActiveExercise, ActiveSet, Exercise } from "@gainos/db";
+import { Colors } from "../../constants/theme";
 
 export default function ActiveWorkoutScreen() {
   const insets = useSafeAreaInsets();
@@ -40,7 +41,6 @@ export default function ActiveWorkoutScreen() {
     updateSet,
     addExercise,
     removeExercise,
-    endWorkout,
     discardWorkout,
   } = useWorkoutStore();
 
@@ -144,7 +144,7 @@ export default function ActiveWorkoutScreen() {
 
 
       // Block the discard-guard useEffect from redirecting to tabs
- 
+
       discardWorkout();
       setSaving(false);
       router.replace({
@@ -179,7 +179,7 @@ export default function ActiveWorkoutScreen() {
     );
   };
 
-  
+
   if (!activeWorkout) return null;
 
   return (
@@ -208,7 +208,7 @@ export default function ActiveWorkoutScreen() {
       {restTimer.isActive && (
         <TouchableOpacity onPress={stopRestTimer}>
           <LinearGradient
-            colors={["#1a1040", "#111113"]}
+            colors={["#0a1400", Colors.bgCard]}
             style={styles.restTimerBanner}
           >
             <View style={styles.restTimerLeft}>
@@ -241,7 +241,7 @@ export default function ActiveWorkoutScreen() {
           contentContainerStyle={styles.scrollContent}
           keyboardShouldPersistTaps="handled"
         >
-          {activeWorkout.exercises.map((ex, exIdx) => (
+          {activeWorkout.exercises.map((ex) => (
             <ExerciseCard
               key={ex.exerciseId}
               exercise={ex}
@@ -371,10 +371,6 @@ function SetRow({
   onComplete: () => void;
   onRemove: () => void;
 }) {
-  const e1rm = set.weight && set.reps
-    ? estimated1RM(parseFloat(set.weight) || 0, parseInt(set.reps) || 0)
-    : null;
-
   return (
     <View style={[styles.setRow, set.isComplete && styles.setRowComplete]}>
       {/* Set number / warmup toggle */}
@@ -539,7 +535,7 @@ function ExercisePickerModal({
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#0a0a0b" },
+  container: { flex: 1, backgroundColor: Colors.bg },
 
   header: {
     flexDirection: "row",
@@ -548,15 +544,15 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingBottom: 12,
     borderBottomWidth: 1,
-    borderBottomColor: "#1a1a1e",
+    borderBottomColor: Colors.bgElevated,
   },
   discardBtn: { padding: 8 },
   discardText: { color: "#6b7280", fontSize: 18 },
   headerCenter: { alignItems: "center", flex: 1 },
-  workoutName: { color: "#f9fafb", fontSize: 16, fontWeight: "700" },
-  elapsedTime: { color: "#6366f1", fontSize: 14, fontWeight: "600" },
+  workoutName: { color: Colors.textBright, fontSize: 16, fontWeight: "700" },
+  elapsedTime: { color: Colors.accent, fontSize: 14, fontWeight: "600" },
   finishBtn: {
-    backgroundColor: "#6366f1",
+    backgroundColor: Colors.accent,
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 10,
@@ -571,21 +567,21 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     gap: 12,
     borderBottomWidth: 1,
-    borderBottomColor: "#2a2a32",
+    borderBottomColor: Colors.borderMid,
   },
   restTimerLeft: { alignItems: "center", width: 60 },
   restTimerLabel: { color: "#9ca3af", fontSize: 10, fontWeight: "700", letterSpacing: 1 },
-  restTimerTime: { color: "#6366f1", fontSize: 22, fontWeight: "800" },
+  restTimerTime: { color: Colors.accent, fontSize: 22, fontWeight: "800" },
   restTimerBar: {
     flex: 1,
     height: 4,
-    backgroundColor: "#2a2a32",
+    backgroundColor: Colors.borderMid,
     borderRadius: 2,
     overflow: "hidden",
   },
   restTimerProgress: {
     height: "100%",
-    backgroundColor: "#6366f1",
+    backgroundColor: Colors.accent,
     borderRadius: 2,
   },
   restTimerSkip: { color: "#6b7280", fontSize: 14, fontWeight: "500" },
@@ -593,12 +589,12 @@ const styles = StyleSheet.create({
   scrollContent: { padding: 16, gap: 16, paddingBottom: 100 },
 
   exerciseCard: {
-    backgroundColor: "#111113",
+    backgroundColor: Colors.bgCard,
     borderRadius: 16,
     padding: 16,
     gap: 12,
     borderWidth: 1,
-    borderColor: "#2a2a32",
+    borderColor: Colors.borderMid,
   },
   exerciseHeader: {
     flexDirection: "row",
@@ -606,10 +602,10 @@ const styles = StyleSheet.create({
     alignItems: "flex-start",
   },
   exerciseHeaderLeft: { flex: 1, gap: 2 },
-  exerciseName: { color: "#f9fafb", fontSize: 17, fontWeight: "700" },
+  exerciseName: { color: Colors.textBright, fontSize: 17, fontWeight: "700" },
   exerciseMeta: { color: "#6b7280", fontSize: 13 },
   exerciseHeaderRight: { flexDirection: "row", alignItems: "center", gap: 12 },
-  setProgress: { color: "#6366f1", fontSize: 13, fontWeight: "600" },
+  setProgress: { color: Colors.accent, fontSize: 13, fontWeight: "600" },
   removeExerciseBtn: { padding: 4 },
   removeExerciseText: { color: "#4b5563", fontSize: 16 },
 
@@ -639,42 +635,42 @@ const styles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: 8,
-    backgroundColor: "#1e1e24",
+    backgroundColor: Colors.bgModal,
     justifyContent: "center",
     alignItems: "center",
   },
-  setNumberWarmup: { backgroundColor: "#1c2436" },
+  setNumberWarmup: { backgroundColor: Colors.infoWarmupBg },
   setNumberText: { color: "#9ca3af", fontSize: 14, fontWeight: "600" },
-  setNumberWarmupText: { color: "#60a5fa" },
+  setNumberWarmupText: { color: Colors.infoLight },
 
   setInput: {
     flex: 1,
     height: 44,
-    backgroundColor: "#1a1a1e",
+    backgroundColor: Colors.bgElevated,
     borderRadius: 10,
     textAlign: "center",
-    color: "#f9fafb",
+    color: Colors.textBright,
     fontSize: 16,
     fontWeight: "600",
     borderWidth: 1,
-    borderColor: "#2a2a32",
+    borderColor: Colors.borderMid,
   },
   setInputSmall: {
     width: 50,
     height: 44,
-    backgroundColor: "#1a1a1e",
+    backgroundColor: Colors.bgElevated,
     borderRadius: 10,
     textAlign: "center",
-    color: "#f9fafb",
+    color: Colors.textBright,
     fontSize: 16,
     fontWeight: "600",
     borderWidth: 1,
-    borderColor: "#2a2a32",
+    borderColor: Colors.borderMid,
   },
   setInputComplete: {
-    backgroundColor: "#0d1a0d",
-    borderColor: "#14532d",
-    color: "#86efac",
+    backgroundColor: Colors.successBg,
+    borderColor: Colors.successBgBorder,
+    color: Colors.successBright,
   },
 
   completeBtn: {
@@ -688,27 +684,27 @@ const styles = StyleSheet.create({
     borderColor: "#166534",
   },
   completeBtnDisabled: {
-    backgroundColor: "#1a1a1e",
-    borderColor: "#2a2a32",
+    backgroundColor: Colors.bgElevated,
+    borderColor: Colors.borderMid,
     opacity: 0.4,
   },
-  completeBtnText: { color: "#22c55e", fontSize: 18, fontWeight: "700" },
+  completeBtnText: { color: Colors.success, fontSize: 18, fontWeight: "700" },
   completedBadge: {
     width: 44,
     height: 44,
     borderRadius: 10,
-    backgroundColor: "#14532d",
+    backgroundColor: Colors.successBgBorder,
     justifyContent: "center",
     alignItems: "center",
   },
-  completedBadgeText: { color: "#4ade80", fontSize: 18, fontWeight: "700" },
+  completedBadgeText: { color: Colors.successLight, fontSize: 18, fontWeight: "700" },
 
   addSetBtn: {
     padding: 12,
     alignItems: "center",
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: "#2a2a32",
+    borderColor: Colors.borderMid,
     borderStyle: "dashed",
   },
   addSetText: { color: "#6b7280", fontSize: 14, fontWeight: "500" },
@@ -718,19 +714,19 @@ const styles = StyleSheet.create({
     alignItems: "center",
     borderRadius: 16,
     borderWidth: 2,
-    borderColor: "#2a2a32",
+    borderColor: Colors.borderMid,
     borderStyle: "dashed",
   },
-  addExerciseText: { color: "#6366f1", fontSize: 16, fontWeight: "600" },
+  addExerciseText: { color: Colors.accent, fontSize: 16, fontWeight: "600" },
 
   // Modal
   modal: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: "rgba(0,0,0,0.8)",
+    backgroundColor: Colors.overlay,
     justifyContent: "flex-end",
   },
   modalContent: {
-    backgroundColor: "#111113",
+    backgroundColor: Colors.bgCard,
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     height: "85%",
@@ -742,40 +738,40 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
   },
-  modalTitle: { color: "#f9fafb", fontSize: 20, fontWeight: "700" },
+  modalTitle: { color: Colors.textBright, fontSize: 20, fontWeight: "700" },
   modalClose: { color: "#6b7280", fontSize: 20, padding: 4 },
   searchInput: {
-    backgroundColor: "#1e1e24",
+    backgroundColor: Colors.bgModal,
     borderRadius: 12,
     padding: 14,
-    color: "#f9fafb",
+    color: Colors.textBright,
     fontSize: 16,
     borderWidth: 1,
-    borderColor: "#2a2a32",
+    borderColor: Colors.borderMid,
   },
   muscleFilter: { maxHeight: 40 },
   muscleChip2: {
     paddingHorizontal: 14,
     paddingVertical: 8,
     borderRadius: 100,
-    backgroundColor: "#1e1e24",
+    backgroundColor: Colors.bgModal,
     marginRight: 8,
     borderWidth: 1,
-    borderColor: "#2a2a32",
+    borderColor: Colors.borderMid,
   },
-  muscleChip2Active: { backgroundColor: "#312e81", borderColor: "#6366f1" },
+  muscleChip2Active: { backgroundColor: Colors.accentDark, borderColor: Colors.accent },
   muscleChip2Text: { color: "#9ca3af", fontSize: 13, fontWeight: "500" },
-  muscleChip2TextActive: { color: "#a5b4fc" },
+  muscleChip2TextActive: { color: Colors.accentLighter },
   exerciseList: { flex: 1 },
   exerciseListItem: {
     flexDirection: "row",
     alignItems: "center",
     paddingVertical: 14,
     borderBottomWidth: 1,
-    borderBottomColor: "#1a1a1e",
+    borderBottomColor: Colors.bgElevated,
   },
   exerciseListItemLeft: { flex: 1, gap: 3 },
-  exerciseListItemName: { color: "#f9fafb", fontSize: 15, fontWeight: "600" },
+  exerciseListItemName: { color: Colors.textBright, fontSize: 15, fontWeight: "600" },
   exerciseListItemMeta: { color: "#6b7280", fontSize: 13 },
-  exerciseListChevron: { color: "#6366f1", fontSize: 22, fontWeight: "700" },
+  exerciseListChevron: { color: Colors.accent, fontSize: 22, fontWeight: "700" },
 });

@@ -18,6 +18,7 @@ import { useAuthStore } from "../store/auth";
 import { supabase } from "../lib/supabase";
 import type { AIMessage, AIConversation } from "@gainos/db";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { Colors } from "../constants/theme";
 
 const SUGGESTED_PROMPTS = [
   "How is my training this week?",
@@ -129,7 +130,7 @@ export default function CoachScreen() {
       <View style={[styles.bubbleRow, isUser && styles.bubbleRowUser]}>
         {!isUser && (
           <View style={styles.coachAvatar}>
-            <Ionicons name="sparkles" size={14} color="#818cf8" />
+            <Ionicons name="sparkles" size={14} color={Colors.accentLight} />
           </View>
         )}
         <View style={[styles.bubble, isUser ? styles.bubbleUser : styles.bubbleCoach]}>
@@ -150,7 +151,7 @@ export default function CoachScreen() {
         onLayout={(e) => setHeaderHeight(e.nativeEvent.layout.height)}
       >
         <Pressable style={styles.backBtn} onPress={() => router.back()}>
-          <Ionicons name="chevron-back" size={24} color="#f4f4f5" />
+          <Ionicons name="chevron-back" size={24} color={Colors.textPrimary} />
         </Pressable>
 
         <Pressable
@@ -158,7 +159,7 @@ export default function CoachScreen() {
           onPress={() => setShowConversations(!showConversations)}
         >
           <View style={styles.coachHeaderAvatar}>
-            <Ionicons name="sparkles" size={16} color="#818cf8" />
+            <Ionicons name="sparkles" size={16} color={Colors.accentLight} />
           </View>
           <View>
             <Text style={styles.headerTitle}>Atlas</Text>
@@ -169,12 +170,12 @@ export default function CoachScreen() {
           <Ionicons
             name={showConversations ? "chevron-up" : "chevron-down"}
             size={14}
-            color="#52525b"
+            color={Colors.textMuted}
           />
         </Pressable>
 
         <Pressable style={styles.newChatBtn} onPress={startNewConversation}>
-          <Ionicons name="add" size={20} color="#52525b" />
+          <Ionicons name="add" size={20} color={Colors.textMuted} />
         </Pressable>
       </View>
 
@@ -220,7 +221,7 @@ export default function CoachScreen() {
         ListEmptyComponent={
           <View style={styles.emptyState}>
             <View style={styles.emptyAvatar}>
-              <Ionicons name="sparkles" size={28} color="#818cf8" />
+              <Ionicons name="sparkles" size={28} color={Colors.accentLight} />
             </View>
             <Text style={styles.emptyTitle}>Atlas</Text>
             <Text style={styles.emptySub}>
@@ -239,10 +240,10 @@ export default function CoachScreen() {
           isTyping ? (
             <View style={styles.bubbleRow}>
               <View style={styles.coachAvatar}>
-                <Ionicons name="sparkles" size={14} color="#818cf8" />
+                <Ionicons name="sparkles" size={14} color={Colors.accentLight} />
               </View>
               <View style={styles.typingBubble}>
-                <ActivityIndicator size="small" color="#818cf8" />
+                <ActivityIndicator size="small" color={Colors.accentLight} />
               </View>
             </View>
           ) : null
@@ -267,7 +268,7 @@ export default function CoachScreen() {
             value={inputText}
             onChangeText={setInputText}
             placeholder="Ask Atlas..."
-            placeholderTextColor="#3f3f46"
+            placeholderTextColor={Colors.textFaint}
             multiline
             maxLength={500}
             returnKeyType="send"
@@ -288,7 +289,7 @@ export default function CoachScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#0a0a0b", position: "relative" },
+  container: { flex: 1, backgroundColor: Colors.bg, position: "relative" },
   header: {
     flexDirection: "row",
     alignItems: "center",
@@ -309,19 +310,19 @@ const styles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: 18,
-    backgroundColor: "rgba(99,102,241,0.12)",
+    backgroundColor: "rgba(163,230,53,0.12)",
     justifyContent: "center",
     alignItems: "center",
     borderWidth: 1,
     borderColor: "rgba(129,140,248,0.25)",
   },
-  headerTitle: { fontSize: 15, fontWeight: "700", color: "#f4f4f5" },
-  headerSub: { fontSize: 12, color: "#52525b" },
+  headerTitle: { fontSize: 15, fontWeight: "700", color: Colors.textPrimary },
+  headerSub: { fontSize: 12, color: Colors.textMuted },
   newChatBtn: {
     width: 34,
     height: 34,
     borderRadius: 10,
-    backgroundColor: "rgba(255,255,255,0.05)",
+    backgroundColor: Colors.borderFaint,
     justifyContent: "center",
     alignItems: "center",
   },
@@ -329,85 +330,85 @@ const styles = StyleSheet.create({
     position: "absolute",
     left: 0,
     right: 0,
-    backgroundColor: "#111113",
+    backgroundColor: Colors.bgCard,
     maxHeight: 300,
     zIndex: 100,
     elevation: 20,
     borderBottomWidth: 1,
     borderBottomColor: "rgba(255,255,255,0.06)",
   },
-  convNewItem: { padding: 16, borderBottomWidth: 1, borderBottomColor: "rgba(255,255,255,0.05)" },
-  convNewText: { color: "#6366f1", fontSize: 14, fontWeight: "600" },
+  convNewItem: { padding: 16, borderBottomWidth: 1, borderBottomColor: Colors.borderFaint },
+  convNewText: { color: Colors.accent, fontSize: 14, fontWeight: "600" },
   convItem: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
     padding: 16,
     borderBottomWidth: 1,
-    borderBottomColor: "rgba(255,255,255,0.05)",
+    borderBottomColor: Colors.borderFaint,
   },
-  convItemTitle: { color: "#d4d4d8", fontSize: 14, flex: 1 },
-  convItemDate: { color: "#52525b", fontSize: 12 },
+  convItemTitle: { color: Colors.textLight, fontSize: 14, flex: 1 },
+  convItemDate: { color: Colors.textMuted, fontSize: 12 },
   emptyState: { flex: 1, alignItems: "center", justifyContent: "flex-start", padding: 32, gap: 12 },
   emptyAvatar: {
     width: 64, height: 64, borderRadius: 32,
-    backgroundColor: "rgba(99,102,241,0.12)",
+    backgroundColor: "rgba(163,230,53,0.12)",
     justifyContent: "center", alignItems: "center",
     marginBottom: 4, borderWidth: 1, borderColor: "rgba(129,140,248,0.2)",
   },
-  emptyTitle: { fontSize: 20, fontWeight: "700", color: "#f4f4f5" },
-  emptySub: { fontSize: 14, color: "#52525b", textAlign: "center", lineHeight: 20 },
+  emptyTitle: { fontSize: 20, fontWeight: "700", color: Colors.textPrimary },
+  emptySub: { fontSize: 14, color: Colors.textMuted, textAlign: "center", lineHeight: 20 },
   promptGrid: { width: "100%", gap: 8, marginTop: 8 },
   promptCard: {
-    backgroundColor: "#111113", borderRadius: 12, padding: 14,
-    borderWidth: 1, borderColor: "rgba(255,255,255,0.07)",
+    backgroundColor: Colors.bgCard, borderRadius: 12, padding: 14,
+    borderWidth: 1, borderColor: Colors.borderSubtle,
   },
-  promptText: { color: "#71717a", fontSize: 14 },
+  promptText: { color: Colors.textMid, fontSize: 14 },
   bubbleRow: { flexDirection: "row", alignItems: "flex-end", gap: 8, marginBottom: 6 },
   bubbleRowUser: { flexDirection: "row-reverse" },
   coachAvatar: {
     width: 28, height: 28, borderRadius: 14,
-    backgroundColor: "rgba(99,102,241,0.12)",
+    backgroundColor: "rgba(163,230,53,0.12)",
     justifyContent: "center", alignItems: "center",
   },
   bubble: { maxWidth: "80%", borderRadius: 18, padding: 13, gap: 4 },
-  bubbleUser: { backgroundColor: "#6366f1", borderBottomRightRadius: 4 },
+  bubbleUser: { backgroundColor: Colors.accent, borderBottomRightRadius: 4 },
   bubbleCoach: {
-    backgroundColor: "#111113", borderBottomLeftRadius: 4,
-    borderWidth: 1, borderColor: "rgba(255,255,255,0.07)",
+    backgroundColor: Colors.bgCard, borderBottomLeftRadius: 4,
+    borderWidth: 1, borderColor: Colors.borderSubtle,
   },
-  bubbleText: { fontSize: 15, color: "#d4d4d8", lineHeight: 22 },
+  bubbleText: { fontSize: 15, color: Colors.textLight, lineHeight: 22 },
   bubbleTextUser: { color: "#fff" },
-  bubbleTime: { fontSize: 11, color: "#52525b", alignSelf: "flex-end" },
-  bubbleTimeUser: { color: "#a5b4fc" },
+  bubbleTime: { fontSize: 11, color: Colors.textMuted, alignSelf: "flex-end" },
+  bubbleTimeUser: { color: Colors.accentLighter },
   typingBubble: {
-    backgroundColor: "#111113", borderRadius: 18, padding: 14,
-    borderWidth: 1, borderColor: "rgba(255,255,255,0.07)",
+    backgroundColor: Colors.bgCard, borderRadius: 18, padding: 14,
+    borderWidth: 1, borderColor: Colors.borderSubtle,
   },
   quickPrompts: { flexDirection: "row", gap: 8, paddingHorizontal: 16, paddingVertical: 8 },
   quickPrompt: {
-    flex: 1, backgroundColor: "#111113", borderRadius: 10, padding: 10,
-    borderWidth: 1, borderColor: "rgba(255,255,255,0.07)",
+    flex: 1, backgroundColor: Colors.bgCard, borderRadius: 10, padding: 10,
+    borderWidth: 1, borderColor: Colors.borderSubtle,
   },
-  quickPromptText: { color: "#52525b", fontSize: 12 },
+  quickPromptText: { color: Colors.textMuted, fontSize: 12 },
   inputRow: {
     flexDirection: "row", alignItems: "flex-end", gap: 10,
     paddingHorizontal: 16, paddingVertical: 12,
     borderTopWidth: 1, borderTopColor: "rgba(255,255,255,0.06)",
   },
   input: {
-    flex: 1, backgroundColor: "#111113", borderRadius: 22,
+    flex: 1, backgroundColor: Colors.bgCard, borderRadius: 22,
     paddingHorizontal: 16, paddingTop: 12, paddingBottom: 12,
-    color: "#f4f4f5", fontSize: 15, maxHeight: 120,
-    borderWidth: 1, borderColor: "rgba(255,255,255,0.07)",
+    color: Colors.textPrimary, fontSize: 15, maxHeight: 120,
+    borderWidth: 1, borderColor: Colors.borderSubtle,
   },
   sendBtn: {
     width: 42, height: 42, borderRadius: 21,
-    backgroundColor: "#6366f1", justifyContent: "center", alignItems: "center",
+    backgroundColor: Colors.accent, justifyContent: "center", alignItems: "center",
   },
   sendBtnDisabled: { opacity: 0.35 },
   backdrop: {
     position: "absolute", left: 0, right: 0, bottom: 0,
-    backgroundColor: "rgba(0,0,0,0.5)", zIndex: 50,
+    backgroundColor: Colors.overlayLight, zIndex: 50,
   },
 });

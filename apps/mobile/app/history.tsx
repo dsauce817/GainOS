@@ -6,6 +6,7 @@ import { router } from "expo-router";
 import { supabase } from "../lib/supabase";
 import { useAuthStore } from "../store/auth";
 import type { Workout } from "@gainos/db";
+import { Colors } from "../constants/theme";
 
 function formatDuration(seconds: number | null): string {
   if (!seconds) return "—";
@@ -103,7 +104,7 @@ export default function HistoryScreen() {
     <SafeAreaView style={styles.container} edges={["top"]}>
       <View style={styles.header}>
         <Pressable style={styles.backBtn} onPress={() => router.back()}>
-          <Ionicons name="chevron-back" size={24} color="#f4f4f5" />
+          <Ionicons name="chevron-back" size={24} color={Colors.textPrimary} />
         </Pressable>
         <Text style={styles.title}>History</Text>
         {workouts && workouts.length > 0 ? (
@@ -115,11 +116,11 @@ export default function HistoryScreen() {
 
       {isLoading ? (
         <View style={styles.centered}>
-          <ActivityIndicator color="#818cf8" />
+          <ActivityIndicator color={Colors.accentLight} />
         </View>
       ) : workouts?.length === 0 ? (
         <View style={styles.centered}>
-          <Ionicons name="barbell-outline" size={48} color="#27272a" />
+          <Ionicons name="barbell-outline" size={48} color={Colors.border} />
           <Text style={styles.emptyTitle}>No workouts yet</Text>
           <Text style={styles.emptySubtitle}>Completed workouts will appear here</Text>
         </View>
@@ -141,7 +142,7 @@ export default function HistoryScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#0a0a0b" },
+  container: { flex: 1, backgroundColor: Colors.bg },
   header: {
     flexDirection: "row",
     alignItems: "center",
@@ -151,16 +152,16 @@ const styles = StyleSheet.create({
     paddingBottom: 16,
   },
   backBtn: { padding: 4 },
-  title: { fontSize: 20, fontWeight: "700", color: "#f4f4f5", letterSpacing: -0.3 },
-  subtitle: { fontSize: 13, color: "#52525b" },
+  title: { fontSize: 20, fontWeight: "700", color: Colors.textPrimary, letterSpacing: -0.3 },
+  subtitle: { fontSize: 13, color: Colors.textMuted },
   centered: { flex: 1, alignItems: "center", justifyContent: "center", gap: 8 },
-  emptyTitle: { fontSize: 18, fontWeight: "600", color: "#52525b", marginTop: 12 },
-  emptySubtitle: { fontSize: 14, color: "#3f3f46" },
+  emptyTitle: { fontSize: 18, fontWeight: "600", color: Colors.textMuted, marginTop: 12 },
+  emptySubtitle: { fontSize: 14, color: Colors.textFaint },
   list: { paddingHorizontal: 16 },
   sectionLabel: {
     fontSize: 13,
     fontWeight: "600",
-    color: "#52525b",
+    color: Colors.textMuted,
     letterSpacing: 0.5,
     textTransform: "uppercase",
     marginTop: 20,
@@ -168,12 +169,12 @@ const styles = StyleSheet.create({
     marginLeft: 4,
   },
   card: {
-    backgroundColor: "#111113",
+    backgroundColor: Colors.bgCard,
     borderRadius: 14,
     padding: 16,
     marginBottom: 10,
     borderWidth: 0.5,
-    borderColor: "#27272a",
+    borderColor: Colors.border,
   },
   cardHeader: {
     flexDirection: "row",
@@ -181,10 +182,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: 12,
   },
-  workoutName: { fontSize: 16, fontWeight: "600", color: "#f4f4f5", flex: 1 },
-  workoutDate: { fontSize: 13, color: "#52525b", marginLeft: 8 },
+  workoutName: { fontSize: 16, fontWeight: "600", color: Colors.textPrimary, flex: 1 },
+  workoutDate: { fontSize: 13, color: Colors.textMuted, marginLeft: 8 },
   cardStats: { flexDirection: "row", alignItems: "center", gap: 12 },
   stat: { flexDirection: "row", alignItems: "center", gap: 5 },
-  statValue: { fontSize: 13, color: "#71717a" },
-  statDivider: { width: 1, height: 12, backgroundColor: "#27272a" },
+  statValue: { fontSize: 13, color: Colors.textMid },
+  statDivider: { width: 1, height: 12, backgroundColor: Colors.border },
 });

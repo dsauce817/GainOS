@@ -2,14 +2,15 @@ import { useEffect } from "react";
 import { View, ActivityIndicator } from "react-native";
 import { Redirect } from "expo-router";
 import { useAuthStore } from "../store/auth";
+import { Colors } from "../constants/theme";
 
 export default function Index() {
   const { user, isLoading } = useAuthStore();
 
   if (isLoading) {
     return (
-      <View style={{ flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "#0a0a0b" }}>
-        <ActivityIndicator color="#6366f1" size="large" />
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: Colors.bg }}>
+        <ActivityIndicator color={Colors.accent} size="large" />
       </View>
     );
   }

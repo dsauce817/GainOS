@@ -11,6 +11,7 @@ import { router } from "expo-router";
 import { supabase } from "../../lib/supabase";
 import { useAuthStore } from "../../store/auth";
 import { formatVolume, getRelativeDate } from "@gainos/utils";
+import { Colors } from "../../constants/theme";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -215,7 +216,7 @@ function AnalyticsChart({
   if (!bars.length) {
     return (
       <View style={{ height: CHART_H + 36, alignItems: "center", justifyContent: "center" }}>
-        <Text style={{ color: "#3f3f46", fontSize: 13 }}>No data for this period</Text>
+        <Text style={{ color: Colors.textFaint, fontSize: 13 }}>No data for this period</Text>
       </View>
     );
   }
@@ -261,7 +262,7 @@ function AnalyticsChart({
                     top,
                     backgroundColor: i === 0
                       ? "rgba(255,255,255,0.1)"
-                      : "rgba(255,255,255,0.04)",
+                      : Colors.borderFainter,
                   },
                 ]}
               />
@@ -288,10 +289,10 @@ function AnalyticsChart({
                         width: barW,
                         height: h,
                         backgroundColor: isSelected
-                          ? "#a5b4fc"
+                          ? Colors.accentLighter
                           : dimmed
-                          ? "rgba(99,102,241,0.3)"
-                          : "#6366f1",
+                          ? Colors.accentBgMid
+                          : Colors.accent,
                         borderTopLeftRadius: 3,
                         borderTopRightRadius: 3,
                       }}
@@ -389,9 +390,9 @@ export default function ProgressScreen() {
 
         {/* Stats Row */}
         <View style={styles.statsRow}>
-          <StatCard label="Workouts" value={String(statsData?.totalWorkouts ?? 0)} icon="barbell-outline" color="#818cf8" />
-          <StatCard label="Streak" value={String(profile?.current_streak ?? 0)} suffix="days" icon="flame-outline" color="#f97316" />
-          <StatCard label="Best" value={String(profile?.longest_streak ?? 0)} suffix="days" icon="trophy-outline" color="#f59e0b" />
+          <StatCard label="Workouts" value={String(statsData?.totalWorkouts ?? 0)} icon="barbell-outline" color={Colors.accentLight} />
+          <StatCard label="Streak" value={String(profile?.current_streak ?? 0)} suffix="days" icon="flame-outline" color={Colors.orange} />
+          <StatCard label="Best" value={String(profile?.longest_streak ?? 0)} suffix="days" icon="trophy-outline" color={Colors.amber} />
         </View>
 
         {/* Activity Chart */}
@@ -400,7 +401,7 @@ export default function ProgressScreen() {
             <Text style={styles.sectionTitle}>Activity</Text>
             <Pressable style={styles.rangeBtn} onPress={() => setShowRangePicker(v => !v)}>
               <Text style={styles.rangeBtnText}>{rangeLabel}</Text>
-              <Ionicons name={showRangePicker ? "chevron-up" : "chevron-down"} size={11} color="#818cf8" />
+              <Ionicons name={showRangePicker ? "chevron-up" : "chevron-down"} size={11} color={Colors.accentLight} />
             </Pressable>
           </View>
 
@@ -419,7 +420,7 @@ export default function ProgressScreen() {
                   <Text style={[styles.rangeItemText, range === r.key && styles.rangeItemTextActive]}>
                     {r.label}
                   </Text>
-                  {range === r.key && <Ionicons name="checkmark" size={14} color="#818cf8" />}
+                  {range === r.key && <Ionicons name="checkmark" size={14} color={Colors.accentLight} />}
                 </Pressable>
               ))}
             </View>
@@ -450,7 +451,7 @@ export default function ProgressScreen() {
               </View>
             )}
             {chartLoading ? (
-              <ActivityIndicator color="#818cf8" style={{ height: CHART_H + 36 }} />
+              <ActivityIndicator color={Colors.accentLight} style={{ height: CHART_H + 36 }} />
             ) : (
               <AnalyticsChart
                 bars={bars}
@@ -467,7 +468,7 @@ export default function ProgressScreen() {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Best Lifts</Text>
           {statsLoading ? (
-            <ActivityIndicator color="#818cf8" style={{ marginTop: 16 }} />
+            <ActivityIndicator color={Colors.accentLight} style={{ marginTop: 16 }} />
           ) : (statsData?.prs.length ?? 0) === 0 ? (
             <View style={styles.emptyCard}>
               <Text style={styles.emptyText}>Complete workouts to see your PRs here</Text>
@@ -508,7 +509,7 @@ export default function ProgressScreen() {
                     {getRelativeDate(w.completed_at)} · {w.total_sets} sets · {formatVolume(w.total_volume_kg)}
                   </Text>
                 </View>
-                <Ionicons name="chevron-forward" size={16} color="#3f3f46" />
+                <Ionicons name="chevron-forward" size={16} color={Colors.textFaint} />
               </View>
             ))}
           </View>
@@ -541,17 +542,17 @@ function StatCard({ label, value, suffix, icon, color }: {
 // ─── Styles ───────────────────────────────────────────────────────────────────
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#0a0a0b" },
+  container: { flex: 1, backgroundColor: Colors.bg },
   content: { paddingBottom: 120, gap: 24 },
   header: { paddingHorizontal: 20, paddingTop: 16, paddingBottom: 4 },
-  title: { fontSize: 28, fontWeight: "700", color: "#f4f4f5", letterSpacing: -0.5 },
+  title: { fontSize: 28, fontWeight: "700", color: Colors.textPrimary, letterSpacing: -0.5 },
 
   statsRow: { flexDirection: "row", gap: 12, paddingHorizontal: 20 },
   statCard: {
-    flex: 1, backgroundColor: "#111113", borderRadius: 16,
+    flex: 1, backgroundColor: Colors.bgCard, borderRadius: 16,
     paddingTop: 16, paddingHorizontal: 12, paddingBottom: 14,
     alignItems: "center", gap: 4,
-    borderWidth: 1, borderColor: "#2a2a32", overflow: "hidden",
+    borderWidth: 1, borderColor: Colors.borderMid, overflow: "hidden",
   },
   statAccent: { position: "absolute", top: 0, left: 0, right: 0, height: 3 },
   statValues: { flexDirection: "row", alignItems: "baseline", gap: 2 },
@@ -561,20 +562,20 @@ const styles = StyleSheet.create({
 
   section: { paddingHorizontal: 20, gap: 12 },
   sectionHeader: { flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
-  sectionTitle: { fontSize: 17, fontWeight: "700", color: "#f4f4f5", letterSpacing: -0.2 },
-  seeAll: { fontSize: 13, color: "#818cf8", fontWeight: "600" },
+  sectionTitle: { fontSize: 17, fontWeight: "700", color: Colors.textPrimary, letterSpacing: -0.2 },
+  seeAll: { fontSize: 13, color: Colors.accentLight, fontWeight: "600" },
 
   rangeBtn: {
     flexDirection: "row", alignItems: "center", gap: 5,
     paddingVertical: 5, paddingHorizontal: 10,
-    backgroundColor: "rgba(99,102,241,0.1)",
+    backgroundColor: "rgba(163,230,53,0.1)",
     borderRadius: 8, borderWidth: 1, borderColor: "rgba(129,140,248,0.2)",
   },
-  rangeBtnText: { fontSize: 12, fontWeight: "600", color: "#818cf8" },
+  rangeBtnText: { fontSize: 12, fontWeight: "600", color: Colors.accentLight },
 
   rangeDropdown: {
     backgroundColor: "#161618", borderRadius: 12,
-    borderWidth: 1, borderColor: "#2a2a32", overflow: "hidden",
+    borderWidth: 1, borderColor: Colors.borderMid, overflow: "hidden",
     marginTop: -4,
   },
   rangeItem: {
@@ -582,66 +583,66 @@ const styles = StyleSheet.create({
     paddingVertical: 13, paddingHorizontal: 16,
     borderBottomWidth: 1, borderBottomColor: "#1c1c22",
   },
-  rangeItemActive: { backgroundColor: "rgba(99,102,241,0.08)" },
-  rangeItemText: { fontSize: 14, color: "#71717a" },
-  rangeItemTextActive: { color: "#818cf8", fontWeight: "600" },
+  rangeItemActive: { backgroundColor: Colors.accentBgSoft },
+  rangeItemText: { fontSize: 14, color: Colors.textMid },
+  rangeItemTextActive: { color: Colors.accentLight, fontWeight: "600" },
 
   metricToggle: {
-    flexDirection: "row", backgroundColor: "#111113",
-    borderRadius: 10, padding: 3, borderWidth: 1, borderColor: "#2a2a32",
+    flexDirection: "row", backgroundColor: Colors.bgCard,
+    borderRadius: 10, padding: 3, borderWidth: 1, borderColor: Colors.borderMid,
   },
   metricBtn: { flex: 1, paddingVertical: 7, alignItems: "center", borderRadius: 8 },
-  metricBtnActive: { backgroundColor: "#1e1e2e", borderWidth: 1, borderColor: "#3730a3" },
-  metricBtnText: { fontSize: 12, fontWeight: "500", color: "#52525b" },
-  metricBtnTextActive: { color: "#818cf8", fontWeight: "600" },
+  metricBtnActive: { backgroundColor: "#1e1e2e", borderWidth: 1, borderColor: Colors.accentDark },
+  metricBtnText: { fontSize: 12, fontWeight: "500", color: Colors.textMuted },
+  metricBtnTextActive: { color: Colors.accentLight, fontWeight: "600" },
 
   chartCard: {
-    backgroundColor: "#111113", borderRadius: 16,
+    backgroundColor: Colors.bgCard, borderRadius: 16,
     paddingTop: 16, paddingBottom: 12, paddingHorizontal: 12,
-    borderWidth: 1, borderColor: "#2a2a32", gap: 16,
+    borderWidth: 1, borderColor: Colors.borderMid, gap: 16,
   },
   chartHeader: { paddingHorizontal: 2 },
-  chartHeaderValue: { fontSize: 24, fontWeight: "800", color: "#f4f4f5", letterSpacing: -0.5 },
-  chartHeaderPeriod: { fontSize: 13, color: "#52525b", marginTop: 1 },
+  chartHeaderValue: { fontSize: 24, fontWeight: "800", color: Colors.textPrimary, letterSpacing: -0.5 },
+  chartHeaderPeriod: { fontSize: 13, color: Colors.textMuted, marginTop: 1 },
 
   gridLine: { position: "absolute", left: 0, right: 0, height: 1 },
-  yLabel: { fontSize: 10, color: "#3f3f46", fontWeight: "500" },
-  xLabel: { fontSize: 9, color: "#3f3f46", fontWeight: "500", textAlign: "center" },
-  xLabelSelected: { color: "#818cf8" },
+  yLabel: { fontSize: 10, color: Colors.textFaint, fontWeight: "500" },
+  xLabel: { fontSize: 9, color: Colors.textFaint, fontWeight: "500", textAlign: "center" },
+  xLabelSelected: { color: Colors.accentLight },
 
   selectionDot: {
     width: 4, height: 4, borderRadius: 2,
-    backgroundColor: "#a5b4fc", marginTop: 3,
+    backgroundColor: Colors.accentLighter, marginTop: 3,
   },
 
   emptyCard: {
-    backgroundColor: "#111113", borderRadius: 14,
+    backgroundColor: Colors.bgCard, borderRadius: 14,
     padding: 20, alignItems: "center",
-    borderWidth: 1, borderColor: "#2a2a32",
+    borderWidth: 1, borderColor: Colors.borderMid,
   },
-  emptyText: { color: "#52525b", fontSize: 14, textAlign: "center" },
+  emptyText: { color: Colors.textMuted, fontSize: 14, textAlign: "center" },
 
   prList: {
-    backgroundColor: "#111113", borderRadius: 14,
-    borderWidth: 1, borderColor: "#2a2a32", overflow: "hidden",
+    backgroundColor: Colors.bgCard, borderRadius: 14,
+    borderWidth: 1, borderColor: Colors.borderMid, overflow: "hidden",
   },
   prRow: {
     flexDirection: "row", alignItems: "center",
     paddingVertical: 13, paddingHorizontal: 16,
     borderBottomWidth: 1, borderBottomColor: "#1c1c22", gap: 12,
   },
-  prRank: { fontSize: 12, color: "#52525b", fontWeight: "700", width: 24 },
+  prRank: { fontSize: 12, color: Colors.textMuted, fontWeight: "700", width: 24 },
   prCenter: { flex: 1, gap: 2 },
-  prExercise: { fontSize: 14, fontWeight: "600", color: "#f4f4f5" },
-  prType: { fontSize: 12, color: "#52525b" },
-  prValue: { fontSize: 16, fontWeight: "800", color: "#818cf8" },
+  prExercise: { fontSize: 14, fontWeight: "600", color: Colors.textPrimary },
+  prType: { fontSize: 12, color: Colors.textMuted },
+  prValue: { fontSize: 16, fontWeight: "800", color: Colors.accentLight },
 
   workoutRow: {
     flexDirection: "row", alignItems: "center", justifyContent: "space-between",
-    backgroundColor: "#111113", borderRadius: 14,
-    padding: 14, borderWidth: 1, borderColor: "#2a2a32",
+    backgroundColor: Colors.bgCard, borderRadius: 14,
+    padding: 14, borderWidth: 1, borderColor: Colors.borderMid,
   },
   workoutLeft: { gap: 3, flex: 1 },
-  workoutName: { fontSize: 15, fontWeight: "600", color: "#f4f4f5" },
-  workoutMeta: { fontSize: 13, color: "#52525b" },
+  workoutName: { fontSize: 15, fontWeight: "600", color: Colors.textPrimary },
+  workoutMeta: { fontSize: 13, color: Colors.textMuted },
 });

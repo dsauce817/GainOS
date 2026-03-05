@@ -6,6 +6,7 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { supabase } from "../lib/supabase";
 import { useAuthStore } from "../store/auth";
+import { Colors } from "../constants/theme";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -49,7 +50,7 @@ export default function RootLayout() {
           <Stack
             screenOptions={{
               headerShown: false,
-              contentStyle: { backgroundColor: "#0a0a0b" },
+              contentStyle: { backgroundColor: Colors.bg },
               animation: "fade_from_bottom",
             }}
           >

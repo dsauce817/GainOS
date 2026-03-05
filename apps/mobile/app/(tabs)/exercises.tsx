@@ -16,6 +16,7 @@ import { useQuery } from "@tanstack/react-query";
 import { router } from "expo-router";
 import { supabase } from "../../lib/supabase";
 import type { Exercise } from "@gainos/db";
+import { Colors, CategoryColors } from "../../constants/theme";
 
 const MUSCLE_FILTERS = [
   "All",
@@ -30,13 +31,6 @@ const MUSCLE_FILTERS = [
   "Core",
   "Calves",
 ];
-
-const CATEGORY_COLORS: Record<string, string> = {
-  compound: "#6366f1",
-  isolation: "#0891b2",
-  cardio: "#16a34a",
-  stretch: "#ca8a04",
-};
 
 export default function ExercisesScreen() {
   const [search, setSearch] = useState("");
@@ -86,13 +80,13 @@ export default function ExercisesScreen() {
 
       {/* Search */}
       <View style={styles.searchRow}>
-        <Ionicons name="search-outline" size={16} color="#52525b" style={styles.searchIcon} />
+        <Ionicons name="search-outline" size={16} color={Colors.textMuted} style={styles.searchIcon} />
         <TextInput
           style={styles.searchInput}
           value={search}
           onChangeText={setSearch}
           placeholder="Search exercises..."
-          placeholderTextColor="#3f3f46"
+          placeholderTextColor={Colors.textFaint}
           returnKeyType="search"
           clearButtonMode="while-editing"
         />
@@ -124,7 +118,7 @@ export default function ExercisesScreen() {
       {/* List */}
       {isLoading ? (
         <View style={styles.centered}>
-          <ActivityIndicator color="#818cf8" />
+          <ActivityIndicator color={Colors.accentLight} />
         </View>
       ) : (
         <FlatList
@@ -138,7 +132,7 @@ export default function ExercisesScreen() {
           keyboardShouldPersistTaps="handled"
           ListEmptyComponent={
             <View style={styles.centered}>
-              <Ionicons name="barbell-outline" size={40} color="#27272a" />
+              <Ionicons name="barbell-outline" size={40} color={Colors.border} />
               <Text style={styles.emptyText}>No exercises found</Text>
             </View>
           }
@@ -152,7 +146,7 @@ function ExerciseCard({ exercise }: { exercise: Exercise }) {
   const primaryMuscle = exercise.muscle_groups[0]
     ? exercise.muscle_groups[0].replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())
     : "";
-  const categoryColor = CATEGORY_COLORS[exercise.category] || "#52525b";
+  const categoryColor = CategoryColors[exercise.category] || Colors.textMuted;
 
   return (
     <Pressable
@@ -183,7 +177,7 @@ function ExerciseCard({ exercise }: { exercise: Exercise }) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#0a0a0b" },
+  container: { flex: 1, backgroundColor: Colors.bg },
   header: {
     flexDirection: "row",
     alignItems: "baseline",
@@ -192,18 +186,18 @@ const styles = StyleSheet.create({
     paddingTop: 16,
     paddingBottom: 12,
   },
-  title: { fontSize: 28, fontWeight: "700", color: "#f4f4f5", letterSpacing: -0.5 },
-  count: { fontSize: 14, color: "#52525b" },
+  title: { fontSize: 28, fontWeight: "700", color: Colors.textPrimary, letterSpacing: -0.5 },
+  count: { fontSize: 14, color: Colors.textMuted },
 
   searchRow: {
     flexDirection: "row",
     alignItems: "center",
     marginHorizontal: 16,
     marginBottom: 12,
-    backgroundColor: "#111113",
+    backgroundColor: Colors.bgCard,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: "#27272a",
+    borderColor: Colors.border,
     paddingHorizontal: 12,
     paddingVertical: 10,
     gap: 8,
@@ -211,7 +205,7 @@ const styles = StyleSheet.create({
   searchIcon: {},
   searchInput: {
     flex: 1,
-    color: "#f4f4f5",
+    color: Colors.textPrimary,
     fontSize: 15,
     padding: 0,
   },
@@ -227,16 +221,16 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     paddingVertical: 7,
     borderRadius: 100,
-    backgroundColor: "#111113",
+    backgroundColor: Colors.bgCard,
     borderWidth: 1,
-    borderColor: "#27272a",
+    borderColor: Colors.border,
   },
   filterChipActive: {
-    backgroundColor: "rgba(99,102,241,0.15)",
-    borderColor: "#6366f1",
+    backgroundColor: Colors.accentBg,
+    borderColor: Colors.accent,
   },
-  filterChipText: { fontSize: 13, fontWeight: "500", color: "#71717a" },
-  filterChipTextActive: { color: "#818cf8", fontWeight: "600" },
+  filterChipText: { fontSize: 13, fontWeight: "500", color: Colors.textMid },
+  filterChipTextActive: { color: Colors.accentLight, fontWeight: "600" },
 
   list: { paddingHorizontal: 16, paddingBottom: 120, gap: 8 },
 
@@ -247,14 +241,14 @@ const styles = StyleSheet.create({
     gap: 10,
     paddingTop: 60,
   },
-  emptyText: { fontSize: 15, color: "#52525b" },
+  emptyText: { fontSize: 15, color: Colors.textMuted },
 
   card: {
-    backgroundColor: "#111113",
+    backgroundColor: Colors.bgCard,
     borderRadius: 14,
     padding: 14,
     borderWidth: 1,
-    borderColor: "#27272a",
+    borderColor: Colors.border,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
@@ -262,11 +256,11 @@ const styles = StyleSheet.create({
   },
   cardPressed: { opacity: 0.7 },
   cardLeft: { flex: 1, gap: 4 },
-  cardName: { fontSize: 15, fontWeight: "600", color: "#f4f4f5" },
+  cardName: { fontSize: 15, fontWeight: "600", color: Colors.textPrimary },
   cardMeta: { flexDirection: "row", alignItems: "center", gap: 6 },
-  cardMuscle: { fontSize: 13, color: "#71717a" },
-  dot: { width: 3, height: 3, borderRadius: 2, backgroundColor: "#3f3f46" },
-  cardEquipment: { fontSize: 13, color: "#52525b" },
+  cardMuscle: { fontSize: 13, color: Colors.textMid },
+  dot: { width: 3, height: 3, borderRadius: 2, backgroundColor: Colors.textFaint },
+  cardEquipment: { fontSize: 13, color: Colors.textMuted },
   categoryBadge: {
     paddingHorizontal: 10,
     paddingVertical: 4,

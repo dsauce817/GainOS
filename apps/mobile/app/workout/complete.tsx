@@ -5,7 +5,6 @@ import { useEffect, useRef, useState } from "react";
 import {
   View,
   Text,
-  ScrollView,
   TouchableOpacity,
   StyleSheet,
   Animated,
@@ -20,6 +19,7 @@ import * as Haptics from "expo-haptics";
 import { formatDuration, formatVolume, formatPRType } from "@gainos/utils";
 import type { WorkoutCelebration, PRResult, AchievementUnlock } from "@gainos/db";
 import { useWorkoutStore } from "../../store/workout";
+import { Colors } from "../../constants/theme";
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get("window");
 
 export default function WorkoutCompleteScreen() {
@@ -38,7 +38,8 @@ export default function WorkoutCompleteScreen() {
       y: new Animated.Value(-20),
       rotation: new Animated.Value(0),
       opacity: new Animated.Value(1),
-      color: ["#6366f1", "#8b5cf6", "#22c55e", "#f59e0b", "#ef4444", "#06b6d4"][i % 6] || "#6366f1",
+      // Keep confetti colors as literals per instructions
+      color: ["#a3e635", "#84cc16", "#22c55e", "#f59e0b", "#ef4444", "#06b6d4"][i % 6] || "#a3e635",
     }))
   ).current;
 
@@ -219,7 +220,7 @@ export default function WorkoutCompleteScreen() {
               onPress={() => router.replace("/(tabs)")}
             >
               <LinearGradient
-                colors={["#6366f1", "#8b5cf6"]}
+                colors={[Colors.accent, Colors.accentStrong]}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 0 }}
                 style={styles.primaryBtnGradient}
@@ -258,7 +259,6 @@ function PRCelebrationCard({
   onLaunchConfetti: () => void;
 }) {
   const scaleAnim = useRef(new Animated.Value(0)).current;
-  const rotateAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
@@ -278,20 +278,21 @@ function PRCelebrationCard({
     ]).start();
   }, [index]);
 
+  // Keep prTypeColors as literals per instructions
   const prTypeColors: Record<string, [string, string]> = {
     weight: ["#16a34a", "#22c55e"],
     reps: ["#1d4ed8", "#3b82f6"],
-    estimated_1rm: ["#7c3aed", "#8b5cf6"],
+    estimated_1rm: ["#7c3aed", "#84cc16"],
     volume: ["#b45309", "#f59e0b"],
   };
 
-  const colors = prTypeColors[pr.prType] || ["#6366f1", "#8b5cf6"];
+  const colors = prTypeColors[pr.prType] || ["#a3e635", "#84cc16"];
 
   return (
     <View style={styles.prOverlay}>
       <Animated.View style={[styles.prCard, { transform: [{ scale: scaleAnim }] }]}>
         <LinearGradient
-          colors={[colors[0]! + "33", "#111113"]}
+          colors={[colors[0]! + "33", Colors.bgCard]}
           style={styles.prCardGradient}
         >
           <Text style={styles.prUnlocked}>🎯 PR UNLOCKED</Text>
@@ -347,7 +348,7 @@ function AchievementUnlockCard({
     <View style={styles.prOverlay}>
       <Animated.View style={[styles.prCard, { transform: [{ scale: scaleAnim }] }]}>
         <LinearGradient
-          colors={[achievement.color + "33", "#111113"]}
+          colors={[achievement.color + "33", Colors.bgCard]}
           style={styles.prCardGradient}
         >
           <Text style={styles.prUnlocked}>🏆 ACHIEVEMENT UNLOCKED</Text>
@@ -416,7 +417,7 @@ function AchievementSummaryRow({ achievement }: { achievement: AchievementUnlock
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#0a0a0b" },
+  container: { flex: 1, backgroundColor: Colors.bg },
   content: { padding: 20, gap: 24, paddingBottom: 60 },
 
   confettiParticle: {
@@ -429,8 +430,8 @@ const styles = StyleSheet.create({
 
   header: { alignItems: "center", gap: 8, paddingTop: 20 },
   emoji: { fontSize: 64 },
-  title: { fontSize: 32, fontWeight: "900", color: "#f9fafb", letterSpacing: -1 },
-  subtitle: { fontSize: 17, color: "#22c55e", fontWeight: "600" },
+  title: { fontSize: 32, fontWeight: "900", color: Colors.textBright, letterSpacing: -1 },
+  subtitle: { fontSize: 17, color: Colors.success, fontWeight: "600" },
 
   statsGrid: {
     flexDirection: "row",
@@ -440,68 +441,68 @@ const styles = StyleSheet.create({
   statCell: {
     flex: 1,
     minWidth: "45%",
-    backgroundColor: "#111113",
+    backgroundColor: Colors.bgCard,
     borderRadius: 16,
     padding: 20,
     alignItems: "center",
     gap: 4,
     borderWidth: 1,
-    borderColor: "#2a2a32",
+    borderColor: Colors.borderMid,
   },
-  statCellValue: { fontSize: 24, fontWeight: "800", color: "#f9fafb" },
+  statCellValue: { fontSize: 24, fontWeight: "800", color: Colors.textBright },
   statCellLabel: { fontSize: 13, color: "#6b7280" },
 
   section: { gap: 12 },
-  sectionTitle: { fontSize: 18, fontWeight: "700", color: "#f9fafb" },
+  sectionTitle: { fontSize: 18, fontWeight: "700", color: Colors.textBright },
 
   prSummaryRow: {
     flexDirection: "row",
     alignItems: "center",
     gap: 12,
-    backgroundColor: "#0d1a0d",
+    backgroundColor: Colors.successBg,
     borderRadius: 14,
     padding: 14,
     borderWidth: 1,
-    borderColor: "#14532d",
+    borderColor: Colors.successBgBorder,
   },
   prSummaryBadge: {
-    backgroundColor: "#16a34a",
+    backgroundColor: Colors.successBorder,
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 6,
   },
   prSummaryBadgeText: { color: "#fff", fontSize: 11, fontWeight: "800" },
   prSummaryContent: { flex: 1, gap: 2 },
-  prSummaryExercise: { fontSize: 15, fontWeight: "600", color: "#f9fafb" },
-  prSummaryMeta: { fontSize: 13, color: "#86efac" },
+  prSummaryExercise: { fontSize: 15, fontWeight: "600", color: Colors.textBright },
+  prSummaryMeta: { fontSize: 13, color: Colors.successBright },
 
   achSummaryRow: {
     flexDirection: "row",
     alignItems: "center",
     gap: 12,
-    backgroundColor: "#111113",
+    backgroundColor: Colors.bgCard,
     borderRadius: 14,
     padding: 14,
     borderWidth: 1,
-    borderColor: "#2a2a32",
+    borderColor: Colors.borderMid,
   },
   achSummaryIcon: { fontSize: 32 },
   achSummaryContent: { flex: 1, gap: 2 },
-  achSummaryName: { fontSize: 15, fontWeight: "600", color: "#f9fafb" },
+  achSummaryName: { fontSize: 15, fontWeight: "600", color: Colors.textBright },
   achSummaryDesc: { fontSize: 13, color: "#9ca3af" },
 
   xpBadge: {
-    backgroundColor: "#1c1a0a",
+    backgroundColor: Colors.warningBg,
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 6,
     borderWidth: 1,
-    borderColor: "#ca8a04",
+    borderColor: Colors.warning,
     alignSelf: "flex-start",
     marginTop: 8,
     marginHorizontal: "auto",
   },
-  xpBadgeText: { color: "#fbbf24", fontSize: 13, fontWeight: "700" },
+  xpBadgeText: { color: Colors.warningLight, fontSize: 13, fontWeight: "700" },
 
   actions: { gap: 12 },
   primaryBtn: { borderRadius: 16, overflow: "hidden" },
@@ -512,14 +513,18 @@ const styles = StyleSheet.create({
     alignItems: "center",
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: "#2a2a32",
+    borderColor: Colors.borderMid,
   },
   secondaryBtnText: { color: "#9ca3af", fontSize: 15, fontWeight: "500" },
 
   // PR Overlay
   prOverlay: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: "rgba(0,0,0,0.85)",
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: Colors.overlayMid,
     justifyContent: "center",
     alignItems: "center",
     zIndex: 50,
@@ -530,7 +535,7 @@ const styles = StyleSheet.create({
     borderRadius: 28,
     overflow: "hidden",
     borderWidth: 1,
-    borderColor: "#2a2a32",
+    borderColor: Colors.borderMid,
   },
   prCardGradient: {
     padding: 32,
@@ -545,8 +550,8 @@ const styles = StyleSheet.create({
     borderRadius: 100,
     borderWidth: 2,
   },
-  prBadgeLargeText: { fontSize: 13, fontWeight: "800", color: "#f9fafb", letterSpacing: 1 },
-  prExercise: { fontSize: 24, fontWeight: "800", color: "#f9fafb", textAlign: "center" },
+  prBadgeLargeText: { fontSize: 13, fontWeight: "800", color: Colors.textBright, letterSpacing: 1 },
+  prExercise: { fontSize: 24, fontWeight: "800", color: Colors.textBright, textAlign: "center" },
   prValues: { alignItems: "center", gap: 4 },
   prNewValue: { fontSize: 52, fontWeight: "900", letterSpacing: -2 },
   prPrevValue: { fontSize: 14, color: "#6b7280" },
@@ -559,6 +564,6 @@ const styles = StyleSheet.create({
   prNextBtnText: { color: "#fff", fontSize: 17, fontWeight: "700" },
 
   achievementIcon: { fontSize: 72, marginVertical: 8 },
-  achievementName: { fontSize: 28, fontWeight: "800", color: "#f9fafb", textAlign: "center" },
+  achievementName: { fontSize: 28, fontWeight: "800", color: Colors.textBright, textAlign: "center" },
   achievementDesc: { fontSize: 15, color: "#9ca3af", textAlign: "center", lineHeight: 22 },
 });

@@ -13,6 +13,7 @@ import Animated, {
 import { useAuthStore } from "../../store/auth";
 import { supabase } from "../../lib/supabase";
 import { formatVolume, getRelativeDate } from "@gainos/utils";
+import { Colors } from "../../constants/theme";
 
 export default function HomeScreen() {
   const { profile } = useAuthStore();
@@ -67,7 +68,7 @@ export default function HomeScreen() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.content}
         refreshControl={
-          <RefreshControl refreshing={isRefetching} onRefresh={refetch} tintColor="#818cf8" />
+          <RefreshControl refreshing={isRefetching} onRefresh={refetch} tintColor={Colors.accentLight} />
         }
       >
         {/* Header */}
@@ -78,7 +79,7 @@ export default function HomeScreen() {
           </View>
           <Pressable onPress={() => router.push("/coach")} style={styles.coachButton}>
             <LinearGradient
-              colors={["#6366f1", "#8b5cf6"]}
+              colors={[Colors.accent, Colors.accentStrong]}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 1 }}
               style={styles.coachButtonGradient}
@@ -91,15 +92,15 @@ export default function HomeScreen() {
 
         {/* Streak + Stats Row */}
         <View style={styles.statsRow}>
-          <StatCard label="Streak" value={`${profile?.current_streak || 0}`} suffix="days" emoji="🔥" color="#f97316" />
+          <StatCard label="Streak" value={`${profile?.current_streak || 0}`} suffix="days" emoji="🔥" color={Colors.orange} />
           <StatCard
             label="This Week"
             value={`${stats?.weeklyVolume.reduce((sum, v) => sum + v.total_sets, 0) || 0}`}
             suffix="sets"
             emoji="📊"
-            color="#818cf8"
+            color={Colors.accentLight}
           />
-          <StatCard label="Trophies" value={`${stats?.achievementCount || 0}`} suffix="" emoji="🏆" color="#f59e0b" />
+          <StatCard label="Trophies" value={`${stats?.achievementCount || 0}`} suffix="" emoji="🏆" color={Colors.amber} />
         </View>
 
         {/* Weekly Volume by Muscle */}
@@ -134,7 +135,7 @@ export default function HomeScreen() {
         {/* Start Workout CTA */}
         <Pressable style={styles.startCTA} onPress={() => router.push("/workouts")}>
           <LinearGradient
-            colors={["#6366f1", "#8b5cf6"]}
+            colors={[Colors.accent, Colors.accentStrong]}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 0 }}
             style={styles.startCTAGradient}
@@ -182,9 +183,9 @@ function MuscleChip({ muscle, sets }: { muscle: string; sets: number }) {
   const displayName = muscle.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
   const status = sets >= 10 ? "optimal" : sets >= 6 ? "mev" : "low";
   const chipColors = {
-    optimal: { bg: "#052e16", border: "#16a34a", text: "#4ade80" },
-    mev: { bg: "#1c1a0a", border: "#ca8a04", text: "#fbbf24" },
-    low: { bg: "#1c0f0f", border: "#b91c1c", text: "#f87171" },
+    optimal: { bg: Colors.successBgDeep, border: Colors.successBorder, text: Colors.successLight },
+    mev: { bg: Colors.warningBg, border: Colors.warning, text: Colors.warningLight },
+    low: { bg: Colors.errorBg, border: Colors.errorDark, text: Colors.errorLight },
   };
   const c = chipColors[status];
 
@@ -266,7 +267,7 @@ function getThisWeekMonday() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#0a0a0b" },
+  container: { flex: 1, backgroundColor: Colors.bg },
   content: { paddingBottom: 120, gap: 24 },
   header: {
     flexDirection: "row",
@@ -276,7 +277,7 @@ const styles = StyleSheet.create({
     paddingTop: 16,
   },
   greeting: { fontSize: 15, color: "#6b7280", fontWeight: "500" },
-  name: { fontSize: 28, fontWeight: "800", color: "#f9fafb", letterSpacing: -0.5 },
+  name: { fontSize: 28, fontWeight: "800", color: Colors.textBright, letterSpacing: -0.5 },
   coachButton: { borderRadius: 12, overflow: "hidden" },
   coachButtonGradient: {
     flexDirection: "row",
@@ -293,7 +294,7 @@ const styles = StyleSheet.create({
   },
   statCard: {
     flex: 1,
-    backgroundColor: "#111113",
+    backgroundColor: Colors.bgCard,
     borderRadius: 16,
     paddingTop: 16,
     paddingHorizontal: 12,
@@ -301,7 +302,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: 4,
     borderWidth: 1,
-    borderColor: "#2a2a32",
+    borderColor: Colors.borderMid,
     overflow: "hidden",
   },
   statAccent: {
@@ -318,8 +319,8 @@ const styles = StyleSheet.create({
   statLabel: { fontSize: 11, color: "#6b7280", textAlign: "center" },
   section: { paddingHorizontal: 20, gap: 12 },
   sectionHeader: { flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
-  sectionTitle: { fontSize: 17, fontWeight: "700", color: "#f9fafb", letterSpacing: -0.2 },
-  seeAll: { fontSize: 13, color: "#818cf8", fontWeight: "600" },
+  sectionTitle: { fontSize: 17, fontWeight: "700", color: Colors.textBright, letterSpacing: -0.2 },
+  seeAll: { fontSize: 13, color: Colors.accentLight, fontWeight: "600" },
   muscleGrid: { flexDirection: "row", flexWrap: "wrap", gap: 8 },
   muscleChip: {
     flexDirection: "row",
@@ -336,41 +337,41 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    backgroundColor: "#111113",
+    backgroundColor: Colors.bgCard,
     borderRadius: 14,
     padding: 16,
     borderWidth: 1,
-    borderColor: "#2a2a32",
+    borderColor: Colors.borderMid,
   },
   workoutRowLeft: { gap: 4, flex: 1 },
-  workoutRowName: { fontSize: 15, fontWeight: "600", color: "#f9fafb" },
+  workoutRowName: { fontSize: 15, fontWeight: "600", color: Colors.textBright },
   workoutRowMeta: { fontSize: 13, color: "#6b7280" },
   prRow: {
     flexDirection: "row",
     alignItems: "center",
     gap: 12,
-    backgroundColor: "#0d1a0d",
+    backgroundColor: Colors.successBg,
     borderRadius: 14,
     padding: 14,
     borderWidth: 1,
-    borderColor: "#14532d",
+    borderColor: Colors.successBgBorder,
   },
   prBadge: {
-    backgroundColor: "#16a34a",
+    backgroundColor: Colors.successBorder,
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 6,
   },
   prBadgeText: { color: "#fff", fontSize: 11, fontWeight: "800" },
   prRowContent: { flex: 1, gap: 2 },
-  prExerciseName: { fontSize: 14, fontWeight: "600", color: "#f9fafb" },
-  prMeta: { fontSize: 13, color: "#86efac" },
+  prExerciseName: { fontSize: 14, fontWeight: "600", color: Colors.textBright },
+  prMeta: { fontSize: 13, color: Colors.successBright },
   prDate: { fontSize: 12, color: "#6b7280" },
   startCTA: {
     marginHorizontal: 20,
     borderRadius: 16,
     overflow: "hidden",
-    shadowColor: "#6366f1",
+    shadowColor: Colors.accent,
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.35,
     shadowRadius: 16,

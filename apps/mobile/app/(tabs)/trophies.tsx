@@ -1,11 +1,12 @@
 // GainOS Trophies & Achievements Screen
-import { View, Text, ScrollView, StyleSheet, SectionList } from "react-native";
+import { View, Text, ScrollView, StyleSheet } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useQuery } from "@tanstack/react-query";
 import { useAuthStore } from "../../store/auth";
 import { supabase } from "../../lib/supabase";
-import type { UserAchievement, AchievementDefinition, PersonalRecord } from "@gainos/db";
+import type { AchievementDefinition } from "@gainos/db";
+import { Colors } from "../../constants/theme";
 
 export default function TrophiesScreen() {
   const { profile } = useAuthStore();
@@ -78,7 +79,7 @@ export default function TrophiesScreen() {
         {/* Overall progress bar */}
         <View style={styles.progressBar}>
           <LinearGradient
-            colors={["#6366f1", "#8b5cf6"]}
+            colors={[Colors.accent, Colors.accentStrong]}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 0 }}
             style={[
@@ -141,7 +142,7 @@ function AchievementBadge({ achievement }: { achievement: AchievementDefinition 
   return (
     <View style={[styles.achievementBadge, !achievement.earned && styles.achievementBadgeLocked]}>
       <LinearGradient
-        colors={achievement.earned ? [achievement.color + "44", "#111113"] : ["#1a1a1e", "#111113"]}
+        colors={achievement.earned ? [achievement.color + "44", Colors.bgCard] : [Colors.bgElevated, Colors.bgCard]}
         style={styles.achievementBadgeGradient}
       >
         <Text style={[styles.achievementBadgeIcon, !achievement.earned && styles.achievementBadgeIconLocked]}>
@@ -171,7 +172,7 @@ function AchievementBadge({ achievement }: { achievement: AchievementDefinition 
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#0a0a0b" },
+  container: { flex: 1, backgroundColor: Colors.bg },
   content: { padding: 20, gap: 24, paddingBottom: 100 },
 
   header: {
@@ -179,42 +180,42 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
   },
-  title: { fontSize: 32, fontWeight: "900", color: "#f9fafb", letterSpacing: -1 },
+  title: { fontSize: 32, fontWeight: "900", color: Colors.textBright, letterSpacing: -1 },
   progressBadge: {
-    backgroundColor: "#1e1e24",
+    backgroundColor: Colors.bgModal,
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 100,
     borderWidth: 1,
-    borderColor: "#2a2a32",
+    borderColor: Colors.borderMid,
   },
   progressText: { color: "#9ca3af", fontSize: 14, fontWeight: "600" },
 
   progressBar: {
     height: 6,
-    backgroundColor: "#1e1e24",
+    backgroundColor: Colors.bgModal,
     borderRadius: 3,
     overflow: "hidden",
   },
   progressFill: { height: "100%", borderRadius: 3 },
 
   section: { gap: 12 },
-  sectionTitle: { fontSize: 18, fontWeight: "700", color: "#f9fafb" },
+  sectionTitle: { fontSize: 18, fontWeight: "700", color: Colors.textBright },
 
   prGrid: { flexDirection: "row", flexWrap: "wrap", gap: 12 },
   prCard: {
     flex: 1,
     minWidth: "45%",
-    backgroundColor: "#0d1a0d",
+    backgroundColor: Colors.successBg,
     borderRadius: 14,
     padding: 16,
     gap: 4,
     borderWidth: 1,
-    borderColor: "#14532d",
+    borderColor: Colors.successBgBorder,
   },
-  prCardType: { fontSize: 11, fontWeight: "700", color: "#22c55e", textTransform: "uppercase", letterSpacing: 0.5 },
-  prCardExercise: { fontSize: 14, fontWeight: "600", color: "#f9fafb" },
-  prCardValue: { fontSize: 22, fontWeight: "800", color: "#4ade80" },
+  prCardType: { fontSize: 11, fontWeight: "700", color: Colors.success, textTransform: "uppercase", letterSpacing: 0.5 },
+  prCardExercise: { fontSize: 14, fontWeight: "600", color: Colors.textBright },
+  prCardValue: { fontSize: 22, fontWeight: "800", color: Colors.successLight },
 
   achievementGrid: { flexDirection: "row", flexWrap: "wrap", gap: 12 },
   achievementBadge: {
@@ -222,13 +223,13 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     overflow: "hidden",
     borderWidth: 1,
-    borderColor: "#2a2a32",
+    borderColor: Colors.borderMid,
   },
   achievementBadgeLocked: { opacity: 0.5 },
   achievementBadgeGradient: { padding: 16, gap: 8, minHeight: 120, justifyContent: "center" },
   achievementBadgeIcon: { fontSize: 32 },
   achievementBadgeIconLocked: { opacity: 0.5 },
-  achievementBadgeName: { fontSize: 13, fontWeight: "700", color: "#f9fafb" },
+  achievementBadgeName: { fontSize: 13, fontWeight: "700", color: Colors.textBright },
   achievementBadgeNameLocked: { color: "#6b7280" },
   achievementXP: {
     paddingHorizontal: 8,

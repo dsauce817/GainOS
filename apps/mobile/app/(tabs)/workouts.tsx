@@ -26,6 +26,7 @@ import { useAuthStore } from "../../store/auth";
 import { useWorkoutStore } from "../../store/workout";
 import { supabase } from "../../lib/supabase";
 import type { Routine } from "@gainos/db";
+import { Colors } from "../../constants/theme";
 
 // ─── Types ─────────────────────────────────────────────────────────────────
 
@@ -396,11 +397,11 @@ export default function RoutinesScreen() {
             <Text style={styles.sectionLabel}>MY ROUTINES</Text>
             <View style={styles.sectionActions}>
               <Pressable style={styles.actionChip} onPress={() => setModal("routine")}>
-                <Ionicons name="add" size={14} color="#818cf8" />
+                <Ionicons name="add" size={14} color={Colors.accentLight} />
                 <Text style={styles.actionChipText}>Routine</Text>
               </Pressable>
               <Pressable style={styles.actionChip} onPress={() => setModal("folder")}>
-                <Ionicons name="folder-outline" size={13} color="#818cf8" />
+                <Ionicons name="folder-outline" size={13} color={Colors.accentLight} />
                 <Text style={styles.actionChipText}>Folder</Text>
               </Pressable>
             </View>
@@ -453,9 +454,9 @@ export default function RoutinesScreen() {
 
         {/* ── Explore ── */}
         <Pressable style={styles.exploreRow} onPress={() => setModal("explore")}>
-          <Ionicons name="compass-outline" size={18} color="#52525b" />
+          <Ionicons name="compass-outline" size={18} color={Colors.textMuted} />
           <Text style={styles.exploreText}>Explore Templates</Text>
-          <Ionicons name="chevron-forward" size={14} color="#3f3f46" style={styles.exploreChevron} />
+          <Ionicons name="chevron-forward" size={14} color={Colors.textFaint} style={styles.exploreChevron} />
         </Pressable>
       </ScrollView>
 
@@ -469,7 +470,7 @@ export default function RoutinesScreen() {
               value={routineName}
               onChangeText={setRoutineName}
               placeholder="e.g. Push Day"
-              placeholderTextColor="#3f3f46"
+              placeholderTextColor={Colors.textFaint}
               autoFocus
             />
             {/* Folder picker */}
@@ -526,7 +527,7 @@ export default function RoutinesScreen() {
               value={folderName}
               onChangeText={setFolderName}
               placeholder="Folder name, e.g. Push / Pull / Legs"
-              placeholderTextColor="#3f3f46"
+              placeholderTextColor={Colors.textFaint}
               autoFocus
             />
             <TextInput
@@ -534,7 +535,7 @@ export default function RoutinesScreen() {
               value={folderFirstRoutine}
               onChangeText={setFolderFirstRoutine}
               placeholder="First routine name"
-              placeholderTextColor="#3f3f46"
+              placeholderTextColor={Colors.textFaint}
             />
             <View style={styles.sheetActions}>
               <Pressable style={styles.cancelBtn} onPress={closeModal}>
@@ -559,7 +560,7 @@ export default function RoutinesScreen() {
             <View style={styles.sheetTitleRow}>
               <Text style={styles.sheetTitle}>Explore Templates</Text>
               <Pressable onPress={closeModal}>
-                <Ionicons name="close" size={22} color="#52525b" />
+                <Ionicons name="close" size={22} color={Colors.textMuted} />
               </Pressable>
             </View>
             <Text style={styles.sheetSubtitle}>
@@ -591,7 +592,7 @@ export default function RoutinesScreen() {
               value={renameFolderValue}
               onChangeText={setRenameFolderValue}
               placeholder="Folder name"
-              placeholderTextColor="#3f3f46"
+              placeholderTextColor={Colors.textFaint}
               autoFocus
             />
             <View style={styles.sheetActions}>
@@ -620,7 +621,7 @@ export default function RoutinesScreen() {
               style={styles.menuSheetItem}
               onPress={() => setModal("reorder-folders")}
             >
-              <Ionicons name="swap-vertical-outline" size={20} color="#a1a1aa" />
+              <Ionicons name="swap-vertical-outline" size={20} color={Colors.textSub} />
               <Text style={styles.menuSheetItemText}>Reorder Folders</Text>
             </Pressable>
             <Pressable
@@ -630,7 +631,7 @@ export default function RoutinesScreen() {
                 setModal("rename-folder");
               }}
             >
-              <Ionicons name="pencil-outline" size={20} color="#a1a1aa" />
+              <Ionicons name="pencil-outline" size={20} color={Colors.textSub} />
               <Text style={styles.menuSheetItemText}>Rename Folder</Text>
             </Pressable>
             <Pressable
@@ -640,7 +641,7 @@ export default function RoutinesScreen() {
                 setModal("routine");
               }}
             >
-              <Ionicons name="add-outline" size={20} color="#a1a1aa" />
+              <Ionicons name="add-outline" size={20} color={Colors.textSub} />
               <Text style={styles.menuSheetItemText}>Add New Routine</Text>
             </Pressable>
             <View style={styles.menuSheetDivider} />
@@ -648,7 +649,7 @@ export default function RoutinesScreen() {
               style={styles.menuSheetItem}
               onPress={() => handleDeleteFolder(activeFolderName || "")}
             >
-              <Ionicons name="trash-outline" size={20} color="#ef4444" />
+              <Ionicons name="trash-outline" size={20} color={Colors.error} />
               <Text style={[styles.menuSheetItemText, styles.menuSheetItemDestructive]}>
                 Delete Folder
               </Text>
@@ -783,8 +784,8 @@ function FolderCard({
       <View style={styles.folderHeader}>
         <GestureDetector gesture={folderDragGesture}>
           <View style={styles.folderHeaderLeft}>
-            <Ionicons name="reorder-three-outline" size={18} color="#3f3f46" />
-            <Ionicons name="folder" size={14} color="#52525b" />
+            <Ionicons name="reorder-three-outline" size={18} color={Colors.textFaint} />
+            <Ionicons name="folder" size={14} color={Colors.textMuted} />
             <Text style={styles.folderName}>{name}</Text>
             <Text style={styles.folderCount}>{routines.length}</Text>
           </View>
@@ -795,11 +796,11 @@ function FolderCard({
             onPress={() => onFolderMenu(name)}
             hitSlop={8}
           >
-            <Ionicons name="ellipsis-horizontal" size={16} color="#3f3f46" />
+            <Ionicons name="ellipsis-horizontal" size={16} color={Colors.textFaint} />
           </Pressable>
           <Pressable onPress={toggle} hitSlop={8} style={styles.menuBtn}>
             <Animated.View style={chevronStyle}>
-              <Ionicons name="chevron-down" size={15} color="#3f3f46" />
+              <Ionicons name="chevron-down" size={15} color={Colors.textFaint} />
             </Animated.View>
           </Pressable>
         </View>
@@ -876,7 +877,7 @@ function RoutineCardRow({
       <View style={styles.routineRowTop}>
         <GestureDetector gesture={panGesture}>
           <View style={styles.routineDragHandle}>
-            <Ionicons name="reorder-three-outline" size={18} color="#3f3f46" />
+            <Ionicons name="reorder-three-outline" size={18} color={Colors.textFaint} />
           </View>
         </GestureDetector>
         <View style={styles.routineRowInfo}>
@@ -886,7 +887,7 @@ function RoutineCardRow({
           ) : null}
         </View>
         <Pressable style={styles.menuBtn} onPress={onMenu}>
-          <Ionicons name="ellipsis-horizontal" size={16} color="#3f3f46" />
+          <Ionicons name="ellipsis-horizontal" size={16} color={Colors.textFaint} />
         </Pressable>
       </View>
       <Pressable style={styles.startRoutineBtn} onPress={onStart}>
@@ -923,7 +924,7 @@ function StandaloneCard({
           ) : null}
         </View>
         <Pressable style={styles.menuBtn} onPress={onMenu}>
-          <Ionicons name="ellipsis-horizontal" size={16} color="#3f3f46" />
+          <Ionicons name="ellipsis-horizontal" size={16} color={Colors.textFaint} />
         </Pressable>
       </View>
       <Pressable style={styles.startRoutineBtn} onPress={onStart}>
@@ -1035,24 +1036,24 @@ function TemplateCard({
 // ─── Styles ─────────────────────────────────────────────────────────────────
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#0a0a0b" },
+  container: { flex: 1, backgroundColor: Colors.bg },
   scroll: { paddingHorizontal: 20, paddingTop: 8, paddingBottom: 120, gap: 28 },
 
-  title: { fontSize: 32, fontWeight: "800", color: "#f4f4f5", letterSpacing: -1, paddingTop: 8 },
+  title: { fontSize: 32, fontWeight: "800", color: Colors.textPrimary, letterSpacing: -1, paddingTop: 8 },
 
   // Primary CTA
   startEmptyCTA: {
-    backgroundColor: "#f4f4f5",
+    backgroundColor: Colors.textPrimary,
     borderRadius: 14,
     paddingVertical: 18,
     alignItems: "center",
-    shadowColor: "#f4f4f5",
+    shadowColor: Colors.textPrimary,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.08,
     shadowRadius: 12,
     elevation: 4,
   },
-  startEmptyText: { fontSize: 16, fontWeight: "700", color: "#0a0a0b", letterSpacing: 0.1 },
+  startEmptyText: { fontSize: 16, fontWeight: "700", color: Colors.bg, letterSpacing: 0.1 },
 
   // Section
   section: { gap: 12 },
@@ -1065,7 +1066,7 @@ const styles = StyleSheet.create({
   sectionLabel: {
     fontSize: 11,
     fontWeight: "600",
-    color: "#52525b",
+    color: Colors.textMuted,
     letterSpacing: 1.2,
     textTransform: "uppercase",
   },
@@ -1077,30 +1078,30 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 6,
     borderRadius: 8,
-    backgroundColor: "rgba(99,102,241,0.1)",
+    backgroundColor: "rgba(163,230,53,0.1)",
   },
-  actionChipText: { fontSize: 12, fontWeight: "600", color: "#818cf8" },
+  actionChipText: { fontSize: 12, fontWeight: "600", color: Colors.accentLight },
 
   // Folder Card
   folderCard: {
-    backgroundColor: "#111113",
+    backgroundColor: Colors.bgCard,
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.07)",
+    borderColor: Colors.borderSubtle,
     overflow: "hidden",
   },
   folderCardDragging: {
     opacity: 0.85,
-    borderColor: "#6366f1",
-    shadowColor: "#6366f1",
+    borderColor: Colors.accent,
+    shadowColor: Colors.accent,
     shadowOpacity: 0.3,
     shadowRadius: 12,
     shadowOffset: { width: 0, height: 4 },
     elevation: 8,
   },
   folderCardTarget: {
-    borderColor: "rgba(99,102,241,0.5)",
-    backgroundColor: "rgba(99,102,241,0.05)",
+    borderColor: Colors.accentBgStrong,
+    backgroundColor: "rgba(163,230,53,0.05)",
   },
   folderHeader: {
     flexDirection: "row",
@@ -1111,12 +1112,12 @@ const styles = StyleSheet.create({
   },
   folderHeaderLeft: { flexDirection: "row", alignItems: "center", gap: 8 },
   folderHeaderRight: { flexDirection: "row", alignItems: "center", gap: 4 },
-  folderName: { fontSize: 14, fontWeight: "600", color: "#a1a1aa", letterSpacing: 0.1 },
+  folderName: { fontSize: 14, fontWeight: "600", color: Colors.textSub, letterSpacing: 0.1 },
   folderCount: {
     fontSize: 12,
     fontWeight: "600",
-    color: "#3f3f46",
-    backgroundColor: "rgba(255,255,255,0.05)",
+    color: Colors.textFaint,
+    backgroundColor: Colors.borderFaint,
     paddingHorizontal: 7,
     paddingVertical: 2,
     borderRadius: 6,
@@ -1128,19 +1129,19 @@ const styles = StyleSheet.create({
 
   // Routine Row (inside folder)
   routineRow: { padding: 16, gap: 12 },
-  routineRowBorder: { borderTopWidth: 1, borderTopColor: "rgba(255,255,255,0.05)" },
-  routineRowDragging: { opacity: 0.85, backgroundColor: "rgba(99,102,241,0.08)" },
-  routineRowTarget: { borderTopWidth: 2, borderTopColor: "#6366f1" },
+  routineRowBorder: { borderTopWidth: 1, borderTopColor: Colors.borderFaint },
+  routineRowDragging: { opacity: 0.85, backgroundColor: Colors.accentBgSoft },
+  routineRowTarget: { borderTopWidth: 2, borderTopColor: Colors.accent },
   routineRowTop: { flexDirection: "row", alignItems: "flex-start", gap: 10 },
   routineRowInfo: { flex: 1, gap: 4 },
   routineDragHandle: { justifyContent: "center", alignItems: "center", paddingRight: 2, paddingTop: 2 },
-  routineName: { fontSize: 16, fontWeight: "700", color: "#f4f4f5" },
-  routinePreview: { fontSize: 12, color: "#52525b", lineHeight: 17 },
+  routineName: { fontSize: 16, fontWeight: "700", color: Colors.textPrimary },
+  routinePreview: { fontSize: 12, color: Colors.textMuted, lineHeight: 17 },
   menuBtn: { width: 28, height: 28, alignItems: "center", justifyContent: "center", marginTop: 2 },
 
   // Start Routine Button (full-width, primary)
   startRoutineBtn: {
-    backgroundColor: "#6366f1",
+    backgroundColor: Colors.accent,
     borderRadius: 10,
     paddingVertical: 13,
     alignItems: "center",
@@ -1149,10 +1150,10 @@ const styles = StyleSheet.create({
 
   // Standalone Card
   standaloneCard: {
-    backgroundColor: "#111113",
+    backgroundColor: Colors.bgCard,
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.07)",
+    borderColor: Colors.borderSubtle,
     padding: 16,
     gap: 12,
   },
@@ -1162,8 +1163,8 @@ const styles = StyleSheet.create({
 
   // Empty state
   emptyState: { alignItems: "center", paddingVertical: 40, gap: 10 },
-  emptyText: { fontSize: 14, color: "#3f3f46" },
-  emptyLink: { fontSize: 14, fontWeight: "600", color: "#6366f1" },
+  emptyText: { fontSize: 14, color: Colors.textFaint },
+  emptyLink: { fontSize: 14, fontWeight: "600", color: Colors.accent },
 
   // Explore Row
   exploreRow: {
@@ -1172,38 +1173,38 @@ const styles = StyleSheet.create({
     gap: 10,
     paddingVertical: 14,
     paddingHorizontal: 16,
-    backgroundColor: "#111113",
+    backgroundColor: Colors.bgCard,
     borderRadius: 14,
     borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.07)",
+    borderColor: Colors.borderSubtle,
   },
-  exploreText: { flex: 1, fontSize: 14, fontWeight: "500", color: "#52525b" },
+  exploreText: { flex: 1, fontSize: 14, fontWeight: "500", color: Colors.textMuted },
   exploreChevron: { marginLeft: "auto" },
 
   // Sheet
-  sheet: { flex: 1, backgroundColor: "rgba(0,0,0,0.8)", justifyContent: "flex-end" },
+  sheet: { flex: 1, backgroundColor: Colors.overlay, justifyContent: "flex-end" },
   sheetBox: {
-    backgroundColor: "#111113",
+    backgroundColor: Colors.bgCard,
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     padding: 24,
     gap: 14,
     borderTopWidth: 1,
-    borderColor: "rgba(255,255,255,0.07)",
+    borderColor: Colors.borderSubtle,
   },
   exploreSheet: { maxHeight: "80%", paddingBottom: 40 },
   sheetTitleRow: { flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
-  sheetTitle: { fontSize: 18, fontWeight: "700", color: "#f4f4f5" },
-  sheetSubtitle: { fontSize: 13, color: "#52525b", marginTop: -6 },
+  sheetTitle: { fontSize: 18, fontWeight: "700", color: Colors.textPrimary },
+  sheetSubtitle: { fontSize: 13, color: Colors.textMuted, marginTop: -6 },
 
   input: {
-    backgroundColor: "#1a1a1e",
+    backgroundColor: Colors.bgElevated,
     borderRadius: 10,
     padding: 14,
-    color: "#f4f4f5",
+    color: Colors.textPrimary,
     fontSize: 16,
     borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.07)",
+    borderColor: Colors.borderSubtle,
   },
 
   // Folder picker (inside modals)
@@ -1211,7 +1212,7 @@ const styles = StyleSheet.create({
   folderPickerLabel: {
     fontSize: 10,
     fontWeight: "600",
-    color: "#3f3f46",
+    color: Colors.textFaint,
     letterSpacing: 1.2,
     textTransform: "uppercase",
   },
@@ -1224,11 +1225,11 @@ const styles = StyleSheet.create({
     borderColor: "rgba(255,255,255,0.08)",
   },
   folderChipActive: {
-    backgroundColor: "rgba(99,102,241,0.15)",
-    borderColor: "rgba(99,102,241,0.4)",
+    backgroundColor: Colors.accentBg,
+    borderColor: "rgba(163,230,53,0.4)",
   },
-  folderChipText: { fontSize: 13, fontWeight: "500", color: "#52525b" },
-  folderChipTextActive: { color: "#818cf8" },
+  folderChipText: { fontSize: 13, fontWeight: "500", color: Colors.textMuted },
+  folderChipTextActive: { color: Colors.accentLight },
 
   sheetActions: { flexDirection: "row", gap: 10, marginTop: 4 },
   cancelBtn: {
@@ -1239,15 +1240,15 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "rgba(255,255,255,0.08)",
   },
-  cancelBtnText: { color: "#71717a", fontWeight: "600", fontSize: 15 },
-  confirmBtn: { flex: 1, padding: 14, alignItems: "center", borderRadius: 10, backgroundColor: "#6366f1" },
+  cancelBtnText: { color: Colors.textMid, fontWeight: "600", fontSize: 15 },
+  confirmBtn: { flex: 1, padding: 14, alignItems: "center", borderRadius: 10, backgroundColor: Colors.accent },
   confirmBtnDisabled: { opacity: 0.4 },
   confirmBtnText: { color: "#fff", fontWeight: "700", fontSize: 15 },
 
   // Template cards (inside Explore)
   templateList: { gap: 12, paddingBottom: 16 },
   templateCard: {
-    backgroundColor: "#0f0f11",
+    backgroundColor: Colors.bgDeep,
     borderRadius: 14,
     borderWidth: 1,
     borderColor: "rgba(255,255,255,0.06)",
@@ -1255,30 +1256,30 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   templateCardHeader: { flexDirection: "row", alignItems: "flex-start" },
-  templateName: { fontSize: 15, fontWeight: "700", color: "#f4f4f5" },
-  templateSubtitle: { fontSize: 12, color: "#52525b" },
-  templateMeta: { fontSize: 11, color: "#3f3f46", fontWeight: "500" },
+  templateName: { fontSize: 15, fontWeight: "700", color: Colors.textPrimary },
+  templateSubtitle: { fontSize: 12, color: Colors.textMuted },
+  templateMeta: { fontSize: 11, color: Colors.textFaint, fontWeight: "500" },
   templateFolderPicker: { gap: 8 },
   templateCardActions: { flexDirection: "row", gap: 8 },
   templateAddBtn: {
     flex: 1,
-    backgroundColor: "rgba(99,102,241,0.15)",
+    backgroundColor: Colors.accentBg,
     borderRadius: 9,
     paddingVertical: 11,
     alignItems: "center",
     borderWidth: 1,
-    borderColor: "rgba(99,102,241,0.3)",
+    borderColor: Colors.accentBgMid,
   },
-  templateAddBtnText: { fontSize: 13, fontWeight: "600", color: "#818cf8" },
+  templateAddBtnText: { fontSize: 13, fontWeight: "600", color: Colors.accentLight },
   templateCancelBtn: {
     paddingHorizontal: 16,
     paddingVertical: 11,
     borderRadius: 9,
     borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.07)",
+    borderColor: Colors.borderSubtle,
     alignItems: "center",
   },
-  templateCancelBtnText: { fontSize: 13, fontWeight: "500", color: "#52525b" },
+  templateCancelBtnText: { fontSize: 13, fontWeight: "500", color: Colors.textMuted },
 
   // Folder menu sheet
   menuSheet: { gap: 0, paddingTop: 16, paddingBottom: 36 },
@@ -1293,7 +1294,7 @@ const styles = StyleSheet.create({
   menuSheetTitle: {
     fontSize: 13,
     fontWeight: "600",
-    color: "#52525b",
+    color: Colors.textMuted,
     letterSpacing: 0.5,
     textTransform: "uppercase",
     paddingHorizontal: 4,
@@ -1306,8 +1307,8 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     paddingHorizontal: 4,
   },
-  menuSheetItemText: { fontSize: 16, fontWeight: "500", color: "#d4d4d8" },
-  menuSheetItemDestructive: { color: "#ef4444" },
+  menuSheetItemText: { fontSize: 16, fontWeight: "500", color: Colors.textLight },
+  menuSheetItemDestructive: { color: Colors.error },
   menuSheetDivider: {
     height: 1,
     backgroundColor: "rgba(255,255,255,0.06)",
@@ -1322,17 +1323,17 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     paddingHorizontal: 4,
     borderBottomWidth: 1,
-    borderBottomColor: "rgba(255,255,255,0.05)",
+    borderBottomColor: Colors.borderFaint,
   },
   reorderRowActive: {
-    backgroundColor: "rgba(99,102,241,0.08)",
+    backgroundColor: Colors.accentBgSoft,
     borderRadius: 10,
   },
   reorderRowTarget: {
-    borderBottomColor: "#6366f1",
+    borderBottomColor: Colors.accent,
     borderBottomWidth: 2,
   },
-  reorderRowName: { flex: 1, fontSize: 15, fontWeight: "600", color: "#f4f4f5" },
+  reorderRowName: { flex: 1, fontSize: 15, fontWeight: "600", color: Colors.textPrimary },
   dragHandle: {
     width: 36,
     height: 36,
@@ -1398,7 +1399,7 @@ function FolderReorderSheet({
           <View style={styles.sheetTitleRow}>
             <Text style={styles.sheetTitle}>Reorder Folders</Text>
             <Pressable onPress={onClose}>
-              <Ionicons name="close" size={22} color="#52525b" />
+              <Ionicons name="close" size={22} color={Colors.textMuted} />
             </Pressable>
           </View>
           <Text style={styles.sheetSubtitle}>Hold and drag the handle to reorder.</Text>
@@ -1464,11 +1465,11 @@ function ReorderRow({
         { transform: [{ translateY }], zIndex: isDragging ? 10 : 1 },
       ]}
     >
-      <Ionicons name="folder" size={14} color="#52525b" />
+      <Ionicons name="folder" size={14} color={Colors.textMuted} />
       <Text style={styles.reorderRowName} numberOfLines={1}>{name}</Text>
       <GestureDetector gesture={panGesture}>
         <View style={styles.dragHandle}>
-          <Ionicons name="reorder-three-outline" size={24} color="#52525b" />
+          <Ionicons name="reorder-three-outline" size={24} color={Colors.textMuted} />
         </View>
       </GestureDetector>
     </Animated.View>

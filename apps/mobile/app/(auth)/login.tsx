@@ -43,7 +43,7 @@ export default function LoginScreen() {
     >
       {/* Background gradient */}
       <LinearGradient
-        colors={["#1a1040", "#0a0a0b"]}
+        colors={["#0a1400", "#0a0a0b"]}
         style={StyleSheet.absoluteFillObject}
         start={{ x: 0.5, y: 0 }}
         end={{ x: 0.5, y: 0.6 }}
@@ -90,7 +90,7 @@ export default function LoginScreen() {
             disabled={loading}
           >
             <LinearGradient
-              colors={["#6366f1", "#8b5cf6"]}
+              colors={["#a3e635", "#84cc16"]}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 0 }}
               style={styles.buttonGradient}
@@ -189,7 +189,7 @@ const styles = StyleSheet.create({
     fontSize: 15,
   },
   footerLink: {
-    color: "#6366f1",
+    color: "#a3e635",
     fontSize: 15,
     fontWeight: "600",
   },
