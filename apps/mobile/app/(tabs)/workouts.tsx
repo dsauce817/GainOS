@@ -14,13 +14,14 @@ import Animated, {
   useSharedValue,
   useAnimatedStyle,
   withSpring,
-  interpolate,
 } from "react-native-reanimated";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import { LinearGradient } from "expo-linear-gradient";
 import { GestureDetector, Gesture } from "react-native-gesture-handler";
 import * as Haptics from "expo-haptics";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { router } from "expo-router";
+import * as SecureStore from "expo-secure-store";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useAuthStore } from "../../store/auth";
 import { useWorkoutStore } from "../../store/workout";
@@ -104,19 +105,17 @@ function parseGroupTag(description: string | null | undefined) {
   return { groupName: null, text: description };
 }
 
+const MY_ROUTINES = "My Routines";
+
 function organizeRoutines(routines: Routine[]) {
-  const groups: Record<string, Routine[]> = {};
-  const standalone: Routine[] = [];
+  const groups: Record<string, Routine[]> = { [MY_ROUTINES]: [] };
   for (const r of routines) {
     const { groupName } = parseGroupTag(r.description);
-    if (groupName) {
-      if (!groups[groupName]) groups[groupName] = [];
-      groups[groupName]!.push(r);
-    } else {
-      standalone.push(r);
-    }
+    const key = groupName || MY_ROUTINES;
+    if (!groups[key]) groups[key] = [];
+    groups[key]!.push(r);
   }
-  return { groups, standalone };
+  return { groups, standalone: [] as Routine[] };
 }
 
 // ─── Screen ─────────────────────────────────────────────────────────────────
@@ -127,27 +126,52 @@ export default function RoutinesScreen() {
   const queryClient = useQueryClient();
 
   // Modal state
-  const [modal, setModal] = useState<"routine" | "folder" | "explore" | "rename-folder" | "folder-menu" | "reorder-folders" | null>(null);
+  const [modal, setModal] = useState<"routine" | "folder" | "explore" | "rename-folder" | "folder-menu" | "reorder-folders" | "routine-menu" | "rename-routine" | null>(null);
 
   // Form state
   const [routineName, setRoutineName] = useState("");
-  const [routineFolder, setRoutineFolder] = useState<string | null>(null);
+  const [routineFolder, setRoutineFolder] = useState<string>(MY_ROUTINES);
   const [folderName, setFolderName] = useState("");
   const [folderFirstRoutine, setFolderFirstRoutine] = useState("");
   const [activeFolderName, setActiveFolderName] = useState<string | null>(null);
   const [renameFolderValue, setRenameFolderValue] = useState("");
+  const [activeRoutine, setActiveRoutine] = useState<Routine | null>(null);
+  const [renameRoutineValue, setRenameRoutineValue] = useState("");
   const [folderOrder, setFolderOrder] = useState<string[]>([]);
   const [folderDragState, setFolderDragState] = useState<{ fromIdx: number; dy: number } | null>(null);
   const folderHeightsRef = useRef<Record<string, number>>({});
 
+  // Routines section collapse
+  const [routinesContentH, setRoutinesContentH] = useState(0);
+  const routinesAnim = useSharedValue(0);
+  const routinesIsOpen = useSharedValue(false);
+  useEffect(() => {
+    SecureStore.getItemAsync("routines_section_open").then((val) => {
+      const open = val === null ? true : val === "1";
+      routinesIsOpen.value = open;
+      routinesAnim.value = open ? 1 : 0;
+    });
+  }, []);
+  const routinesBodyStyle = useAnimatedStyle(() => ({
+    height: routinesAnim.value * routinesContentH,
+    overflow: "hidden",
+  }));
+  const toggleRoutines = () => {
+    routinesIsOpen.value = !routinesIsOpen.value;
+    routinesAnim.value = withSpring(routinesIsOpen.value ? 1 : 0, { damping: 20, stiffness: 180, overshootClamping: true });
+    SecureStore.setItemAsync("routines_section_open", routinesIsOpen.value ? "1" : "0");
+  };
+
   const closeModal = () => {
     setModal(null);
     setRoutineName("");
-    setRoutineFolder(null);
+    setRoutineFolder(MY_ROUTINES);
     setFolderName("");
     setFolderFirstRoutine("");
     setActiveFolderName(null);
     setRenameFolderValue("");
+    setActiveRoutine(null);
+    setRenameRoutineValue("");
   };
 
   const { data: routines } = useQuery({
@@ -164,23 +188,30 @@ export default function RoutinesScreen() {
     enabled: !!profile?.id,
   });
 
-  const { groups, standalone } = organizeRoutines(routines || []);
+  const { groups } = organizeRoutines(routines || []);
   const folderNames = Object.keys(groups);
 
   // Keep folderOrder in sync: preserve custom order, add new, remove deleted
+  // "My Routines" is always pinned first
   const groupNamesKey = folderNames.slice().sort().join(",");
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     setFolderOrder((prev) => {
       const kept = prev.filter((n) => groups[n]);
       const added = folderNames.filter((n) => !prev.includes(n));
-      return [...kept, ...added];
+      const merged = [...kept, ...added];
+      // Ensure My Routines is always first
+      const withoutDefault = merged.filter((n) => n !== MY_ROUTINES);
+      return [MY_ROUTINES, ...withoutDefault];
     });
   }, [groupNamesKey]);
 
   const orderedFolderEntries = folderOrder
     .filter((n) => groups[n])
     .map((n) => [n, groups[n]!] as [string, Routine[]]);
+
+  const myRoutinesItems = groups[MY_ROUTINES] || [];
+  const programEntries = orderedFolderEntries.filter(([n]) => n !== MY_ROUTINES);
 
   const submitSaveFolderOrder = (ordered: string[]) => {
     setFolderOrder(ordered);
@@ -190,22 +221,22 @@ export default function RoutinesScreen() {
     (fromIdx: number, dy: number): number => {
       let tops: number[] = [];
       let top = 0;
-      for (const [n] of orderedFolderEntries) {
+      for (const [n] of programEntries) {
         tops.push(top);
         top += (folderHeightsRef.current[n] ?? 54) + 12;
       }
-      const fromH = folderHeightsRef.current[orderedFolderEntries[fromIdx]?.[0] ?? ""] ?? 54;
+      const fromH = folderHeightsRef.current[programEntries[fromIdx]?.[0] ?? ""] ?? 54;
       const draggedCenter = (tops[fromIdx] ?? 0) + fromH / 2 + dy;
       let closest = fromIdx;
       let minDist = Infinity;
       for (let i = 0; i < tops.length; i++) {
-        const h = folderHeightsRef.current[orderedFolderEntries[i]?.[0] ?? ""] ?? 54;
+        const h = folderHeightsRef.current[programEntries[i]?.[0] ?? ""] ?? 54;
         const dist = Math.abs(draggedCenter - ((tops[i] ?? 0) + h / 2));
         if (dist < minDist) { minDist = dist; closest = i; }
       }
       return closest;
     },
-    [orderedFolderEntries],
+    [programEntries],
   );
 
   const handleFolderDragUpdate = useCallback((fromIdx: number, dy: number) => {
@@ -215,17 +246,25 @@ export default function RoutinesScreen() {
   const handleFolderDragEnd = useCallback(
     (fromIdx: number, dy: number) => {
       const to = getTargetFolderIdx(fromIdx, dy);
-      setFolderOrder((prev) => {
-        if (fromIdx === to) return prev;
-        const next = [...prev];
-        const [item] = next.splice(fromIdx, 1);
-        next.splice(to, 0, item!);
-        return next;
-      });
+      if (fromIdx !== to) {
+        const fromName = programEntries[fromIdx]?.[0];
+        const toName = programEntries[to]?.[0];
+        if (fromName && toName) {
+          setFolderOrder((prev) => {
+            const fromActual = prev.indexOf(fromName);
+            const toActual = prev.indexOf(toName);
+            if (fromActual < 0 || toActual < 0 || fromActual === toActual) return prev;
+            const next = [...prev];
+            const [item] = next.splice(fromActual, 1);
+            next.splice(toActual, 0, item!);
+            return next;
+          });
+        }
+      }
       setFolderDragState(null);
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     },
-    [getTargetFolderIdx],
+    [getTargetFolderIdx, programEntries],
   );
 
   // ── DB helpers ─────────────────────────────────────────────────────────
@@ -273,18 +312,46 @@ export default function RoutinesScreen() {
     router.push("/workout/active");
   };
 
-  const handleRoutineMenu = (routine: Routine) => {
-    Alert.alert(routine.name, undefined, [
-      { text: "Cancel", style: "cancel" },
-      {
-        text: "Delete",
-        style: "destructive",
-        onPress: async () => {
-          await supabase.from("routines").update({ is_active: false }).eq("id", routine.id);
-          queryClient.invalidateQueries({ queryKey: ["routines"] });
-        },
-      },
-    ]);
+  const handleRoutineMenu = (r: Routine) => {
+    setActiveRoutine(r);
+    setModal("routine-menu");
+  };
+
+  const handleDuplicateRoutine = async () => {
+    if (!activeRoutine || !profile) return;
+    const { data: copy } = await supabase
+      .from("routines")
+      .insert({ user_id: profile.id, name: `${activeRoutine.name} (Copy)`, description: activeRoutine.description })
+      .select()
+      .single();
+    if (copy && activeRoutine.routine_exercises?.length) {
+      const rows = activeRoutine.routine_exercises.map((re: any) => ({
+        routine_id: copy.id,
+        exercise_id: re.exercise_id,
+        order_index: re.order_index,
+        target_sets: re.target_sets,
+        target_reps: re.target_reps,
+        rest_seconds: re.rest_seconds,
+      }));
+      await supabase.from("routine_exercises").insert(rows);
+    }
+    queryClient.invalidateQueries({ queryKey: ["routines"] });
+    closeModal();
+  };
+
+  const handleDeleteRoutine = async () => {
+    if (!activeRoutine) return;
+    await supabase.from("routines").update({ is_active: false }).eq("id", activeRoutine.id);
+    queryClient.invalidateQueries({ queryKey: ["routines"] });
+    closeModal();
+  };
+
+  const submitRenameRoutine = async () => {
+    const newName = renameRoutineValue.trim();
+    if (!newName || !activeRoutine) return;
+    await supabase.from("routines").update({ name: newName }).eq("id", activeRoutine.id);
+    queryClient.invalidateQueries({ queryKey: ["routines"] });
+    closeModal();
   };
 
   const handleFolderMenu = (name: string) => {
@@ -293,6 +360,7 @@ export default function RoutinesScreen() {
   };
 
   const handleDeleteFolder = (name: string) => {
+    if (name === MY_ROUTINES) return;
     Alert.alert("Delete Folder", `Delete "${name}" and all its routines?`, [
       { text: "Cancel", style: "cancel" },
       {
@@ -331,13 +399,11 @@ export default function RoutinesScreen() {
 
   const submitNewRoutine = async () => {
     if (!routineName.trim() || !profile) return;
-    const description = routineFolder
-      ? `__group:${routineFolder}__`
-      : undefined;
+    const description = `__group:${routineFolder}__`;
     await supabase.from("routines").insert({
       user_id: profile.id,
       name: routineName.trim(),
-      ...(description ? { description } : {}),
+      description,
     });
     queryClient.invalidateQueries({ queryKey: ["routines"] });
     closeModal();
@@ -368,7 +434,6 @@ export default function RoutinesScreen() {
     queryClient.invalidateQueries({ queryKey: ["routines"] });
   };
 
-  const hasContent = standalone.length > 0 || orderedFolderEntries.length > 0;
 
   return (
     <SafeAreaView style={styles.container} edges={["top"]}>
@@ -377,42 +442,59 @@ export default function RoutinesScreen() {
         contentContainerStyle={styles.scroll}
         scrollEnabled={!folderDragState}
       >
-        {/* ── Title ── */}
-        <Text style={styles.title}>Routines</Text>
+        {/* ── Header ── */}
+        <View style={styles.header}>
+          <Text style={styles.title}>Workouts</Text>
+          {(routines?.length ?? 0) > 0 && (
+            <Text style={styles.titleCount}>
+              {routines!.length} routine{routines!.length !== 1 ? "s" : ""}
+            </Text>
+          )}
+        </View>
 
         {/* ── Primary CTA ── */}
         <Pressable
-          style={styles.startEmptyCTA}
+          style={styles.cta}
           onPress={() => {
             startWorkout("Empty Workout");
             router.push("/workout/active");
           }}
         >
-          <Text style={styles.startEmptyText}>Start Empty Workout</Text>
+          <LinearGradient
+            colors={[Colors.accent, Colors.accentStrong]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+            style={styles.ctaGradient}
+          >
+            <Ionicons name="barbell-outline" size={20} color="#fff" />
+            <Text style={styles.ctaText}>Start Workout</Text>
+          </LinearGradient>
         </Pressable>
 
-        {/* ── My Routines ── */}
-        <View style={styles.section}>
-          <View style={styles.sectionHeader}>
-            <Text style={styles.sectionLabel}>MY ROUTINES</Text>
-            <View style={styles.sectionActions}>
-              <Pressable style={styles.actionChip} onPress={() => setModal("routine")}>
-                <Ionicons name="add" size={14} color={Colors.accentLight} />
-                <Text style={styles.actionChipText}>Routine</Text>
-              </Pressable>
-              <Pressable style={styles.actionChip} onPress={() => setModal("folder")}>
-                <Ionicons name="folder-outline" size={13} color={Colors.accentLight} />
-                <Text style={styles.actionChipText}>Folder</Text>
-              </Pressable>
-            </View>
+        {/* ── Programs ── */}
+        <View style={[styles.section, styles.programSection]}>
+          <View style={[styles.sectionHeader, { marginBottom: 20 }]}>
+            <Text style={styles.sectionLabel}>Programs</Text>
+            <Pressable style={styles.actionChip} onPress={() => setModal("folder")}>
+              <Ionicons name="add" size={14} color={Colors.accentLight} />
+              <Text style={styles.actionChipText}>New Program</Text>
+            </Pressable>
           </View>
 
-          {/* Folders */}
-          {orderedFolderEntries.map(([name, rts], idx) => {
+          {programEntries.map(([name, rts], idx) => {
             const targetFolderIdx = folderDragState
               ? getTargetFolderIdx(folderDragState.fromIdx, folderDragState.dy)
               : -1;
             const isDraggingThis = folderDragState?.fromIdx === idx;
+            let shiftY = 0;
+            if (folderDragState && !isDraggingThis) {
+              const from = folderDragState.fromIdx;
+              const to = targetFolderIdx;
+              const draggedName = programEntries[from]?.[0] ?? "";
+              const draggedH = (folderHeightsRef.current[draggedName] ?? 54) + 12;
+              if (from < to && idx > from && idx <= to) shiftY = -draggedH;
+              else if (from > to && idx >= to && idx < from) shiftY = draggedH;
+            }
             return (
               <FolderCard
                 key={name}
@@ -422,7 +504,7 @@ export default function RoutinesScreen() {
                 onMenu={handleRoutineMenu}
                 onFolderMenu={handleFolderMenu}
                 folderIsDragging={isDraggingThis}
-                folderDragTranslate={isDraggingThis ? folderDragState!.dy : 0}
+                folderDragTranslate={isDraggingThis ? folderDragState!.dy : shiftY}
                 folderIsTarget={!isDraggingThis && idx === targetFolderIdx && folderDragState !== null}
                 onFolderDragUpdate={(dy) => handleFolderDragUpdate(idx, dy)}
                 onFolderDragEnd={(dy) => handleFolderDragEnd(idx, dy)}
@@ -431,33 +513,77 @@ export default function RoutinesScreen() {
             );
           })}
 
-          {/* Standalone */}
-          {standalone.map((r) => (
-            <StandaloneCard
-              key={r.id}
-              routine={r}
-              onStart={() => startFromRoutine(r)}
-              onMenu={() => handleRoutineMenu(r)}
-            />
-          ))}
-
-          {/* Empty state */}
-          {!hasContent && (
-            <View style={styles.emptyState}>
-              <Text style={styles.emptyText}>No routines yet.</Text>
-              <Pressable onPress={() => setModal("explore")}>
-                <Text style={styles.emptyLink}>Explore templates to get started</Text>
-              </Pressable>
+          {programEntries.length === 0 && (
+            <View style={styles.emptyPrograms}>
+              <Text style={styles.emptyText}>No programs yet.</Text>
             </View>
           )}
         </View>
 
+        {/* ──Routines ── */}
+        <View style={[styles.section, styles.programSection]}>
+          <View style={[styles.sectionHeader, { marginBottom: 30 }]}>
+            <Text style={styles.sectionLabel}>Routines</Text>
+            <Pressable
+              style={styles.actionChip}
+              onPress={() => { setRoutineFolder(MY_ROUTINES); setModal("routine"); }}
+            >
+              <Ionicons name="add" size={14} color={Colors.accentLight} />
+              <Text style={styles.actionChipText}>New Routine</Text>
+            </Pressable>
+          </View>
+
+          {/* Collapsible folder-style row */}
+          <View>
+            <View style={styles.folderHeader}>
+              <Pressable style={styles.folderHeaderLeft} onPress={toggleRoutines}>
+                <Ionicons name="folder" size={14} color={Colors.textMuted} />
+                <Text style={styles.folderName}>My Routines</Text>
+                <Text style={styles.folderCount}>{myRoutinesItems.length}</Text>
+              </Pressable>
+            </View>
+
+            {/* Hidden measurer */}
+            <View pointerEvents="none" style={{ position: "absolute", opacity: 0, left: 0, right: 0, top: 48 }}
+              onLayout={(e) => setRoutinesContentH(e.nativeEvent.layout.height)}>
+              <View style={styles.listContainer}>
+                {myRoutinesItems.map((r) => (
+                  <MyRoutineRow key={r.id} routine={r} onStart={() => {}} onMenu={() => {}} />
+                ))}
+              </View>
+            </View>
+
+            <Animated.View style={routinesBodyStyle}>
+              <View style={styles.listContainer}>
+                {myRoutinesItems.map((r) => (
+                  <MyRoutineRow
+                    key={r.id}
+                    routine={r}
+                    onStart={() => startFromRoutine(r)}
+                    onMenu={() => handleRoutineMenu(r)}
+                  />
+                ))}
+                {myRoutinesItems.length === 0 && (
+                  <View style={styles.emptyState}>
+                    <Text style={styles.emptyText}>No routines yet.</Text>
+                    <Pressable onPress={() => setModal("explore")}>
+                      <Text style={styles.emptyLink}>Explore templates to get started</Text>
+                    </Pressable>
+                  </View>
+                )}
+              </View>
+            </Animated.View>
+          </View>
+        </View>
+
         {/* ── Explore ── */}
-        <Pressable style={styles.exploreRow} onPress={() => setModal("explore")}>
-          <Ionicons name="compass-outline" size={18} color={Colors.textMuted} />
-          <Text style={styles.exploreText}>Explore Templates</Text>
-          <Ionicons name="chevron-forward" size={14} color={Colors.textFaint} style={styles.exploreChevron} />
-        </Pressable>
+        <View style={styles.exploreWrapper}>
+          <Pressable style={styles.exploreRow} onPress={() => setModal("explore")}>
+            <Ionicons name="compass-outline" size={20} color={Colors.textMuted} />
+            <Text style={styles.exploreText}>Explore Templates</Text>
+            <Ionicons name="chevron-forward" size={20} color={Colors.textFaint} />
+          </Pressable>
+        </View>
       </ScrollView>
 
       {/* ── New Routine Modal ── */}
@@ -478,14 +604,6 @@ export default function RoutinesScreen() {
               <Text style={styles.folderPickerLabel}>ADD TO FOLDER</Text>
               <ScrollView horizontal showsHorizontalScrollIndicator={false}>
                 <View style={styles.folderChips}>
-                  <Pressable
-                    style={[styles.folderChip, routineFolder === null && styles.folderChipActive]}
-                    onPress={() => setRoutineFolder(null)}
-                  >
-                    <Text style={[styles.folderChipText, routineFolder === null && styles.folderChipTextActive]}>
-                      None
-                    </Text>
-                  </Pressable>
                   {folderNames.map((fn) => (
                     <Pressable
                       key={fn}
@@ -520,13 +638,13 @@ export default function RoutinesScreen() {
       <Modal visible={modal === "folder"} transparent animationType="slide">
         <View style={styles.sheet}>
           <View style={styles.sheetBox}>
-            <Text style={styles.sheetTitle}>New Folder</Text>
-            <Text style={styles.sheetSubtitle}>Folders group related routines together.</Text>
+            <Text style={styles.sheetTitle}>New Program</Text>
+            <Text style={styles.sheetSubtitle}>Programs group related routines together.</Text>
             <TextInput
               style={styles.input}
               value={folderName}
               onChangeText={setFolderName}
-              placeholder="Folder name, e.g. Push / Pull / Legs"
+              placeholder="Program name, e.g. Push / Pull / Legs"
               placeholderTextColor={Colors.textFaint}
               autoFocus
             />
@@ -624,44 +742,111 @@ export default function RoutinesScreen() {
               <Ionicons name="swap-vertical-outline" size={20} color={Colors.textSub} />
               <Text style={styles.menuSheetItemText}>Reorder Folders</Text>
             </Pressable>
+            {activeFolderName !== MY_ROUTINES && (
+              <Pressable
+                style={styles.menuSheetItem}
+                onPress={() => {
+                  setRenameFolderValue(activeFolderName || "");
+                  setModal("rename-folder");
+                }}
+              >
+                <Ionicons name="pencil-outline" size={20} color={Colors.textSub} />
+                <Text style={styles.menuSheetItemText}>Rename Folder</Text>
+              </Pressable>
+            )}
             <Pressable
               style={styles.menuSheetItem}
               onPress={() => {
-                setRenameFolderValue(activeFolderName || "");
-                setModal("rename-folder");
-              }}
-            >
-              <Ionicons name="pencil-outline" size={20} color={Colors.textSub} />
-              <Text style={styles.menuSheetItemText}>Rename Folder</Text>
-            </Pressable>
-            <Pressable
-              style={styles.menuSheetItem}
-              onPress={() => {
-                setRoutineFolder(activeFolderName);
+                setRoutineFolder(activeFolderName ?? MY_ROUTINES);
                 setModal("routine");
               }}
             >
               <Ionicons name="add-outline" size={20} color={Colors.textSub} />
               <Text style={styles.menuSheetItemText}>Add New Routine</Text>
             </Pressable>
+            {activeFolderName !== MY_ROUTINES && (
+              <>
+                <View style={styles.menuSheetDivider} />
+                <Pressable
+                  style={styles.menuSheetItem}
+                  onPress={() => handleDeleteFolder(activeFolderName || "")}
+                >
+                  <Ionicons name="trash-outline" size={20} color={Colors.error} />
+                  <Text style={[styles.menuSheetItemText, styles.menuSheetItemDestructive]}>
+                    Delete Folder
+                  </Text>
+                </Pressable>
+              </>
+            )}
+          </Pressable>
+        </Pressable>
+      </Modal>
+
+      {/* ── Routine Menu Sheet ── */}
+      <Modal visible={modal === "routine-menu"} transparent animationType="slide">
+        <Pressable style={styles.sheet} onPress={closeModal}>
+          <Pressable style={[styles.sheetBox, styles.menuSheet]}>
+            <View style={styles.menuSheetHandle} />
+            <Text style={styles.menuSheetTitle}>{activeRoutine?.name}</Text>
+            <Pressable
+              style={styles.menuSheetItem}
+              onPress={() => { setRenameRoutineValue(activeRoutine?.name ?? ""); setModal("rename-routine"); }}
+            >
+              <Ionicons name="pencil-outline" size={20} color={Colors.textSub} />
+              <Text style={styles.menuSheetItemText}>Edit Name</Text>
+            </Pressable>
+            <Pressable style={styles.menuSheetItem} onPress={handleDuplicateRoutine}>
+              <Ionicons name="copy-outline" size={20} color={Colors.textSub} />
+              <Text style={styles.menuSheetItemText}>Duplicate</Text>
+            </Pressable>
             <View style={styles.menuSheetDivider} />
             <Pressable
               style={styles.menuSheetItem}
-              onPress={() => handleDeleteFolder(activeFolderName || "")}
+              onPress={() => Alert.alert("Delete Routine", `Delete "${activeRoutine?.name}"?`, [
+                { text: "Cancel", style: "cancel" },
+                { text: "Delete", style: "destructive", onPress: handleDeleteRoutine },
+              ])}
             >
               <Ionicons name="trash-outline" size={20} color={Colors.error} />
-              <Text style={[styles.menuSheetItemText, styles.menuSheetItemDestructive]}>
-                Delete Folder
-              </Text>
+              <Text style={[styles.menuSheetItemText, styles.menuSheetItemDestructive]}>Delete</Text>
             </Pressable>
           </Pressable>
         </Pressable>
       </Modal>
 
+      {/* ── Rename Routine Modal ── */}
+      <Modal visible={modal === "rename-routine"} transparent animationType="slide">
+        <View style={styles.sheet}>
+          <View style={styles.sheetBox}>
+            <Text style={styles.sheetTitle}>Edit Routine Name</Text>
+            <TextInput
+              style={styles.input}
+              value={renameRoutineValue}
+              onChangeText={setRenameRoutineValue}
+              placeholder="Routine name"
+              placeholderTextColor={Colors.textFaint}
+              autoFocus
+            />
+            <View style={styles.sheetActions}>
+              <Pressable style={styles.cancelBtn} onPress={() => setModal("routine-menu")}>
+                <Text style={styles.cancelBtnText}>Cancel</Text>
+              </Pressable>
+              <Pressable
+                style={[styles.confirmBtn, !renameRoutineValue.trim() && styles.confirmBtnDisabled]}
+                onPress={submitRenameRoutine}
+                disabled={!renameRoutineValue.trim()}
+              >
+                <Text style={styles.confirmBtnText}>Save</Text>
+              </Pressable>
+            </View>
+          </View>
+        </View>
+      </Modal>
+
       {/* ── Reorder Folders Sheet ── */}
       <FolderReorderSheet
         visible={modal === "reorder-folders"}
-        folders={folderOrder.filter((n) => groups[n])}
+        folders={folderOrder.filter((n) => groups[n] && n !== MY_ROUTINES)}
         onClose={() => setModal("folder-menu")}
         onSave={submitSaveFolderOrder}
       />
@@ -699,8 +884,18 @@ function FolderCard({
   onHeightChange?: (h: number) => void;
 }) {
   const [contentH, setContentH] = useState(0);
-  const anim = useSharedValue(1);
-  const isOpen = useSharedValue(true);
+  const anim = useSharedValue(0);
+  const isOpen = useSharedValue(false);
+
+  const folderKey = `folder_open_${name.replace(/[^a-zA-Z0-9._-]/g, "_")}`;
+
+  useEffect(() => {
+    SecureStore.getItemAsync(folderKey).then((val) => {
+      const open = val === null ? true : val === "1";
+      isOpen.value = open;
+      anim.value = open ? 1 : 0;
+    });
+  }, []);
 
   // Routine drag state (internal)
   const [routineOrder, setRoutineOrder] = useState<Routine[]>(routines);
@@ -736,15 +931,12 @@ function FolderCard({
       stiffness: 180,
       overshootClamping: true,
     });
+    SecureStore.setItemAsync(folderKey, isOpen.value ? "1" : "0");
   };
 
   const bodyStyle = useAnimatedStyle(() => ({
     height: anim.value * contentH,
     overflow: "hidden",
-  }));
-
-  const chevronStyle = useAnimatedStyle(() => ({
-    transform: [{ rotate: `${interpolate(anim.value, [0, 1], [180, 0])}deg` }],
   }));
 
   // Folder-level drag gesture (long press on header left)
@@ -754,6 +946,10 @@ function FolderCard({
     .onBegin(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium))
     .onUpdate((e) => onFolderDragUpdate?.(e.translationY))
     .onEnd((e) => onFolderDragEnd?.(e.translationY));
+
+  const avgRowH = contentH > 0 && routineOrder.length > 0
+    ? Math.round(contentH / routineOrder.length)
+    : ROUTINE_H;
 
   const rows = routineOrder.map((r, i) => (
     <RoutineCardRow
@@ -767,6 +963,7 @@ function FolderCard({
       targetIdx={routineTargetIdx}
       onDragUpdate={handleRoutineUpdate}
       onDrop={handleRoutineDrop}
+      rowH={avgRowH}
     />
   ));
 
@@ -780,35 +977,23 @@ function FolderCard({
       ]}
       onLayout={(e) => onHeightChange?.(e.nativeEvent.layout.height)}
     >
-      {/* Folder Header */}
-      <View style={styles.folderHeader}>
-        <GestureDetector gesture={folderDragGesture}>
-          <View style={styles.folderHeaderLeft}>
-            <Ionicons name="reorder-three-outline" size={18} color={Colors.textFaint} />
+      {/* Folder Header — tap to toggle, long press to drag */}
+      <GestureDetector gesture={folderDragGesture}>
+        <View style={styles.folderHeader}>
+          <Pressable style={styles.folderHeaderLeft} onPress={toggle}>
             <Ionicons name="folder" size={14} color={Colors.textMuted} />
             <Text style={styles.folderName}>{name}</Text>
             <Text style={styles.folderCount}>{routines.length}</Text>
-          </View>
-        </GestureDetector>
-        <View style={styles.folderHeaderRight}>
-          <Pressable
-            style={styles.menuBtn}
-            onPress={() => onFolderMenu(name)}
-            hitSlop={8}
-          >
-            <Ionicons name="ellipsis-horizontal" size={16} color={Colors.textFaint} />
           </Pressable>
-          <Pressable onPress={toggle} hitSlop={8} style={styles.menuBtn}>
-            <Animated.View style={chevronStyle}>
-              <Ionicons name="chevron-down" size={15} color={Colors.textFaint} />
-            </Animated.View>
+          <Pressable style={styles.menuBtn} onPress={() => onFolderMenu(name)} hitSlop={8}>
+            <Ionicons name="ellipsis-horizontal" size={20} color={Colors.textFaint} />
           </Pressable>
         </View>
-      </View>
+      </GestureDetector>
 
       {/* Animated Body */}
-      <Animated.View style={bodyStyle}>
-        <View style={[styles.folderBody, routineDragState && { overflow: "visible" }]}>{rows}</View>
+      <Animated.View style={[bodyStyle, routineDragState ? { overflow: "visible" as const } : undefined]}>
+        <View style={styles.folderBody}>{rows}</View>
       </Animated.View>
 
       {/* Hidden measurer */}
@@ -829,12 +1014,13 @@ function RoutineCardRow({
   routine,
   onStart,
   onMenu,
-  hasBorderTop,
+  hasBorderTop: _hasBorderTop,
   index,
   dragState,
   targetIdx,
   onDragUpdate,
   onDrop,
+  rowH,
 }: {
   routine: Routine;
   onStart: () => void;
@@ -845,9 +1031,9 @@ function RoutineCardRow({
   targetIdx: number;
   onDragUpdate: (idx: number, dy: number) => void;
   onDrop: (idx: number, dy: number) => void;
+  rowH: number;
 }) {
   const isDragging = dragState?.idx === index;
-  const isTarget = !isDragging && index === targetIdx && dragState !== null;
 
   const panGesture = Gesture.Pan()
     .runOnJS(true)
@@ -856,50 +1042,53 @@ function RoutineCardRow({
     .onUpdate((e) => onDragUpdate(index, e.translationY))
     .onEnd((e) => onDrop(index, e.translationY));
 
-  const translateY = isDragging ? (dragState?.dy ?? 0) : 0;
+  let translateY = 0;
+  if (isDragging) {
+    translateY = dragState?.dy ?? 0;
+  } else if (dragState) {
+    const from = dragState.idx;
+    const to = targetIdx;
+    if (from < to && index > from && index <= to) translateY = -rowH;
+    else if (from > to && index >= to && index < from) translateY = rowH;
+  }
 
   const preview = routine.routine_exercises
-    ?.slice(0, 3)
+    ?.slice(0, 4)
     .map((re: any) => re.exercises?.name)
     .filter(Boolean)
-    .join(" · ");
+    .join(" • ");
 
   return (
-    <Animated.View
-      style={[
-        styles.routineRow,
-        hasBorderTop && styles.routineRowBorder,
-        isDragging && styles.routineRowDragging,
-        isTarget && styles.routineRowTarget,
-        { transform: [{ translateY }], zIndex: isDragging ? 10 : 1 },
-      ]}
-    >
-      <View style={styles.routineRowTop}>
-        <GestureDetector gesture={panGesture}>
-          <View style={styles.routineDragHandle}>
-            <Ionicons name="reorder-three-outline" size={18} color={Colors.textFaint} />
+    <GestureDetector gesture={panGesture}>
+      <Animated.View
+        style={[
+          styles.routineRow,
+          isDragging && styles.routineRowDragging,
+          { transform: [{ translateY }], zIndex: isDragging ? 10 : 1 },
+        ]}
+      >
+        <View style={styles.routineRowHeader}>
+          <View style={styles.routineRowInfo}>
+            <Text style={styles.routineName}>{routine.name}</Text>
+            {preview ? (
+              <Text style={styles.routinePreview} numberOfLines={2}>{preview}</Text>
+            ) : null}
           </View>
-        </GestureDetector>
-        <View style={styles.routineRowInfo}>
-          <Text style={styles.routineName}>{routine.name}</Text>
-          {preview ? (
-            <Text style={styles.routinePreview} numberOfLines={1}>{preview}</Text>
-          ) : null}
+          <Pressable style={styles.menuBtn} onPress={onMenu} hitSlop={8}>
+            <Ionicons name="ellipsis-horizontal" size={20} color={Colors.textFaint} />
+          </Pressable>
         </View>
-        <Pressable style={styles.menuBtn} onPress={onMenu}>
-          <Ionicons name="ellipsis-horizontal" size={16} color={Colors.textFaint} />
+        <Pressable style={styles.startBtnFull} onPress={onStart}>
+          <Text style={styles.startBtnFullText}>Start Routine</Text>
         </Pressable>
-      </View>
-      <Pressable style={styles.startRoutineBtn} onPress={onStart}>
-        <Text style={styles.startRoutineBtnText}>Start Routine</Text>
-      </Pressable>
-    </Animated.View>
+      </Animated.View>
+    </GestureDetector>
   );
 }
 
-// ─── Standalone Card ────────────────────────────────────────────────────────
+// ─── My Routine Row (flat, no drag) ─────────────────────────────────────────
 
-function StandaloneCard({
+function MyRoutineRow({
   routine,
   onStart,
   onMenu,
@@ -909,26 +1098,26 @@ function StandaloneCard({
   onMenu: () => void;
 }) {
   const preview = routine.routine_exercises
-    ?.slice(0, 3)
+    ?.slice(0, 4)
     .map((re: any) => re.exercises?.name)
     .filter(Boolean)
-    .join(" · ");
+    .join(" • ");
 
   return (
-    <View style={styles.standaloneCard}>
-      <View style={styles.routineRowTop}>
+    <View style={styles.routineRow}>
+      <View style={styles.routineRowHeader}>
         <View style={styles.routineRowInfo}>
           <Text style={styles.routineName}>{routine.name}</Text>
           {preview ? (
-            <Text style={styles.routinePreview} numberOfLines={1}>{preview}</Text>
+            <Text style={styles.routinePreview} numberOfLines={2}>{preview}</Text>
           ) : null}
         </View>
-        <Pressable style={styles.menuBtn} onPress={onMenu}>
-          <Ionicons name="ellipsis-horizontal" size={16} color={Colors.textFaint} />
+        <Pressable style={styles.menuBtn} onPress={onMenu} hitSlop={8}>
+          <Ionicons name="ellipsis-horizontal" size={20} color={Colors.textFaint} />
         </Pressable>
       </View>
-      <Pressable style={styles.startRoutineBtn} onPress={onStart}>
-        <Text style={styles.startRoutineBtnText}>Start Routine</Text>
+      <Pressable style={styles.startBtnFull} onPress={onStart}>
+        <Text style={styles.startBtnFullText}>Start Routine</Text>
       </Pressable>
     </View>
   );
@@ -1037,301 +1226,165 @@ function TemplateCard({
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: Colors.bg },
-  scroll: { paddingHorizontal: 20, paddingTop: 8, paddingBottom: 120, gap: 28 },
+  scroll:     { paddingBottom: 120, gap: 24 },
 
-  title: { fontSize: 32, fontWeight: "800", color: Colors.textPrimary, letterSpacing: -1, paddingTop: 8 },
+  // ── Header ──────────────────────────────────────────────────────────────
+  header:     { paddingHorizontal: 20, paddingTop: 16, gap: 2 },
+  title:      { fontSize: 28, fontWeight: "800", color: Colors.textBright, letterSpacing: -0.5 },
+  titleCount: { fontSize: 13, fontWeight: "500", color: Colors.textMuted, letterSpacing: -0.1 },
 
-  // Primary CTA
-  startEmptyCTA: {
-    backgroundColor: Colors.textPrimary,
-    borderRadius: 14,
-    paddingVertical: 18,
-    alignItems: "center",
-    shadowColor: Colors.textPrimary,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.08,
-    shadowRadius: 12,
-    elevation: 4,
-  },
-  startEmptyText: { fontSize: 16, fontWeight: "700", color: Colors.bg, letterSpacing: 0.1 },
+  // ── Primary CTA ─────────────────────────────────────────────────────────
+  cta:         { marginHorizontal: 20, borderRadius: 18, overflow: "hidden" },
+  ctaGradient: { flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 10, paddingVertical: 20 },
+  ctaText:     { fontSize: 17, fontWeight: "800", color: "#fff", letterSpacing: -0.1 },
 
-  // Section
-  section: { gap: 12 },
-  sectionHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingHorizontal: 2,
+  // ── Section ─────────────────────────────────────────────────────────────
+  section:       { paddingHorizontal: 20, gap: 12 },
+  programSection: {
+    gap: 0,
   },
-  sectionLabel: {
-    fontSize: 11,
-    fontWeight: "600",
-    color: Colors.textMuted,
-    letterSpacing: 1.2,
-    textTransform: "uppercase",
-  },
+  sectionHeader: { flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
+  routinesSectionToggle: { flexDirection: "row", alignItems: "center", gap: 8, flex: 1 },
+  sectionLabel:  { fontSize: 26, fontWeight: "800", color: Colors.textBright, letterSpacing: -0.5 },
   sectionActions: { flexDirection: "row", gap: 8 },
   actionChip: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 4,
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    borderRadius: 8,
-    backgroundColor: "rgba(163,230,53,0.1)",
+    flexDirection: "row", alignItems: "center", gap: 4,
+    paddingHorizontal: 10, paddingVertical: 6,
+    borderRadius: 8, backgroundColor: "rgba(63,209,122,0.1)",
   },
   actionChipText: { fontSize: 12, fontWeight: "600", color: Colors.accentLight },
 
-  // Folder Card
-  folderCard: {
-    backgroundColor: Colors.bgCard,
-    borderRadius: 16,
-    borderWidth: 1,
-    borderColor: Colors.borderSubtle,
-    overflow: "hidden",
+  // ── List container (standalone grouped) ─────────────────────────────────
+  listContainer: { gap: 8, marginTop: 8 },
+
+  // ── Standalone flat row ──────────────────────────────────────────────────
+  standaloneRow: {
+    flexDirection: "row", alignItems: "center",
+    paddingRight: 4,
+    borderBottomWidth: 0.5, borderBottomColor: Colors.separator,
   },
+  standaloneContent: {
+    flex: 1, flexDirection: "row", alignItems: "center",
+    paddingVertical: 14, paddingLeft: 16, paddingRight: 4, gap: 8,
+  },
+
+  // ── Folder Card ──────────────────────────────────────────────────────────
+  folderCard: {},  // no background — surfaces separate via screen bg only
   folderCardDragging: {
-    opacity: 0.85,
-    borderColor: Colors.accent,
-    shadowColor: Colors.accent,
-    shadowOpacity: 0.3,
-    shadowRadius: 12,
-    shadowOffset: { width: 0, height: 4 },
-    elevation: 8,
+    opacity: 0.85, borderWidth: 1, borderColor: Colors.accent,
+    shadowColor: Colors.accent, shadowOpacity: 0.25, shadowRadius: 10,
+    shadowOffset: { width: 0, height: 3 }, elevation: 6, borderRadius: 10,
   },
-  folderCardTarget: {
-    borderColor: Colors.accentBgStrong,
-    backgroundColor: "rgba(163,230,53,0.05)",
-  },
+  folderCardTarget: { borderWidth: 1, borderColor: Colors.accentBgStrong, borderRadius: 10 },
   folderHeader: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    paddingHorizontal: 16,
-    paddingVertical: 14,
+    paddingHorizontal: 0,
+    paddingVertical: 0,
   },
-  folderHeaderLeft: { flexDirection: "row", alignItems: "center", gap: 8 },
-  folderHeaderRight: { flexDirection: "row", alignItems: "center", gap: 4 },
-  folderName: { fontSize: 14, fontWeight: "600", color: Colors.textSub, letterSpacing: 0.1 },
+  folderHeaderLeft:  { flex: 1, flexDirection: "row", alignItems: "center", gap: 8 },
+  folderName:  { fontSize: 17, fontWeight: "600", color: Colors.textBright, letterSpacing: -0.2 },
   folderCount: {
-    fontSize: 12,
-    fontWeight: "600",
-    color: Colors.textFaint,
+    fontSize: 12, fontWeight: "600", color: Colors.textFaint,
     backgroundColor: Colors.borderFaint,
-    paddingHorizontal: 7,
-    paddingVertical: 2,
-    borderRadius: 6,
+    paddingHorizontal: 7, paddingVertical: 2, borderRadius: 6,
   },
-  folderBody: {
-    borderTopWidth: 1,
-    borderTopColor: "rgba(255,255,255,0.06)",
-  },
+  folderBody: { gap: 8, marginTop: 8 },
 
-  // Routine Row (inside folder)
-  routineRow: { padding: 16, gap: 12 },
-  routineRowBorder: { borderTopWidth: 1, borderTopColor: Colors.borderFaint },
-  routineRowDragging: { opacity: 0.85, backgroundColor: Colors.accentBgSoft },
-  routineRowTarget: { borderTopWidth: 2, borderTopColor: Colors.accent },
-  routineRowTop: { flexDirection: "row", alignItems: "flex-start", gap: 10 },
-  routineRowInfo: { flex: 1, gap: 4 },
-  routineDragHandle: { justifyContent: "center", alignItems: "center", paddingRight: 2, paddingTop: 2 },
-  routineName: { fontSize: 16, fontWeight: "700", color: Colors.textPrimary },
-  routinePreview: { fontSize: 12, color: Colors.textMuted, lineHeight: 17 },
-  menuBtn: { width: 28, height: 28, alignItems: "center", justifyContent: "center", marginTop: 2 },
+  // ── Routine card (inside folder) ─────────────────────────────────────────
+  routineRow:        { backgroundColor: Colors.bgCard, borderRadius: 12, padding: 14, gap: 12 },
+  routineRowHeader:  { flexDirection: "row", alignItems: "flex-start", gap: 8 },
+  routineRowContent: { flex: 1, flexDirection: "row", alignItems: "center", gap: 8 },
+  routineRowActions: { flexDirection: "row", alignItems: "center", gap: 2 },
+  routineRowBorder:  {},
+  startBtn:          { paddingHorizontal: 11, paddingVertical: 6, borderRadius: 8, backgroundColor: "rgba(63,209,122,0.1)" },
+  startBtnText:      { fontSize: 12, fontWeight: "600", color: Colors.accentLight },
+  startBtnFull:      { backgroundColor: Colors.accent, borderRadius: 8, paddingVertical: 10, alignItems: "center" as const },
+  startBtnFullText:  { color: "#fff", fontSize: 14, fontWeight: "700" as const },
+  routineRowDragging: { opacity: 0.85 },
+  routineRowTarget:   { borderTopWidth: 2, borderTopColor: Colors.accent },
+  routineRowInfo:     { flex: 1, gap: 4 },
+  routineName:    { fontSize: 15, fontWeight: "600", color: Colors.textBright, letterSpacing: -0.1 },
+  routinePreview: { fontSize: 13, color: Colors.textMuted },
+  menuBtn:        { width: 36, height: 48, alignItems: "center", justifyContent: "center" },
 
-  // Start Routine Button (full-width, primary)
-  startRoutineBtn: {
-    backgroundColor: Colors.accent,
-    borderRadius: 10,
-    paddingVertical: 13,
-    alignItems: "center",
-  },
-  startRoutineBtnText: { fontSize: 15, fontWeight: "700", color: "#fff" },
-
-  // Standalone Card
-  standaloneCard: {
-    backgroundColor: Colors.bgCard,
-    borderRadius: 16,
-    borderWidth: 1,
-    borderColor: Colors.borderSubtle,
-    padding: 16,
-    gap: 12,
-  },
-
-  // Hidden measurer
+  // ── Hidden measurer ──────────────────────────────────────────────────────
   hiddenMeasurer: { position: "absolute", opacity: 0, left: 0, right: 0, top: 0 },
 
-  // Empty state
-  emptyState: { alignItems: "center", paddingVertical: 40, gap: 10 },
-  emptyText: { fontSize: 14, color: Colors.textFaint },
-  emptyLink: { fontSize: 14, fontWeight: "600", color: Colors.accent },
+  // ── Empty state ──────────────────────────────────────────────────────────
+  emptyState:    { alignItems: "center", paddingVertical: 40, gap: 10 },
+  emptyPrograms: { paddingVertical: 20, alignItems: "center" },
+  emptyText:  { fontSize: 14, color: Colors.textFaint },
+  emptyLink:  { fontSize: 14, fontWeight: "600", color: Colors.accent },
 
-  // Explore Row
-  exploreRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 10,
-    paddingVertical: 14,
-    paddingHorizontal: 16,
-    backgroundColor: Colors.bgCard,
-    borderRadius: 14,
-    borderWidth: 1,
-    borderColor: Colors.borderSubtle,
-  },
-  exploreText: { flex: 1, fontSize: 14, fontWeight: "500", color: Colors.textMuted },
-  exploreChevron: { marginLeft: "auto" },
+  // ── Explore row ──────────────────────────────────────────────────────────
+  exploreWrapper: { marginHorizontal: 20, backgroundColor: Colors.bgCard, borderRadius: 14, overflow: "hidden" },
+  exploreRow:     { flexDirection: "row", alignItems: "center", gap: 10, paddingVertical: 14, paddingHorizontal: 16 },
+  exploreText:    { flex: 1, fontSize: 17, fontWeight: "600", color: Colors.textBright },
+  exploreChevron: { marginLeft: "auto" as const },
 
-  // Sheet
-  sheet: { flex: 1, backgroundColor: Colors.overlay, justifyContent: "flex-end" },
-  sheetBox: {
-    backgroundColor: Colors.bgCard,
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
-    padding: 24,
-    gap: 14,
-    borderTopWidth: 1,
-    borderColor: Colors.borderSubtle,
-  },
-  exploreSheet: { maxHeight: "80%", paddingBottom: 40 },
+  // ── Sheet ────────────────────────────────────────────────────────────────
+  sheet:    { flex: 1, backgroundColor: Colors.overlay, justifyContent: "flex-end" },
+  sheetBox: { backgroundColor: Colors.bgCard, borderTopLeftRadius: 24, borderTopRightRadius: 24, padding: 24, gap: 14 },
+  exploreSheet:  { maxHeight: "80%", paddingBottom: 40 },
   sheetTitleRow: { flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
-  sheetTitle: { fontSize: 18, fontWeight: "700", color: Colors.textPrimary },
+  sheetTitle:    { fontSize: 18, fontWeight: "700", color: Colors.textPrimary },
   sheetSubtitle: { fontSize: 13, color: Colors.textMuted, marginTop: -6 },
 
   input: {
-    backgroundColor: Colors.bgElevated,
-    borderRadius: 10,
-    padding: 14,
-    color: Colors.textPrimary,
-    fontSize: 16,
-    borderWidth: 1,
-    borderColor: Colors.borderSubtle,
+    backgroundColor: Colors.bgElevated, borderRadius: 10, padding: 14,
+    color: Colors.textPrimary, fontSize: 16,
+    borderWidth: 1, borderColor: Colors.borderSubtle,
   },
 
-  // Folder picker (inside modals)
+  // ── Folder picker (modals) ───────────────────────────────────────────────
   folderPickerSection: { gap: 8 },
-  folderPickerLabel: {
-    fontSize: 10,
-    fontWeight: "600",
-    color: Colors.textFaint,
-    letterSpacing: 1.2,
-    textTransform: "uppercase",
-  },
-  folderChips: { flexDirection: "row", gap: 8 },
-  folderChip: {
-    paddingHorizontal: 12,
-    paddingVertical: 7,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.08)",
-  },
-  folderChipActive: {
-    backgroundColor: Colors.accentBg,
-    borderColor: "rgba(163,230,53,0.4)",
-  },
-  folderChipText: { fontSize: 13, fontWeight: "500", color: Colors.textMuted },
-  folderChipTextActive: { color: Colors.accentLight },
+  folderPickerLabel:   { fontSize: 11, fontWeight: "600", color: Colors.textFaint, letterSpacing: -0.1 },
+  folderChips:         { flexDirection: "row", gap: 8 },
+  folderChip:          { paddingHorizontal: 12, paddingVertical: 7, borderRadius: 8, borderWidth: 1, borderColor: "rgba(255,255,255,0.08)" },
+  folderChipActive:    { backgroundColor: Colors.accentBg, borderColor: "rgba(63,209,122,0.4)" },
+  folderChipText:      { fontSize: 13, fontWeight: "500", color: Colors.textMuted },
+  folderChipTextActive:{ color: Colors.accentLight },
 
-  sheetActions: { flexDirection: "row", gap: 10, marginTop: 4 },
-  cancelBtn: {
-    flex: 1,
-    padding: 14,
-    alignItems: "center",
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.08)",
-  },
-  cancelBtnText: { color: Colors.textMid, fontWeight: "600", fontSize: 15 },
-  confirmBtn: { flex: 1, padding: 14, alignItems: "center", borderRadius: 10, backgroundColor: Colors.accent },
-  confirmBtnDisabled: { opacity: 0.4 },
-  confirmBtnText: { color: "#fff", fontWeight: "700", fontSize: 15 },
+  sheetActions:      { flexDirection: "row", gap: 10, marginTop: 4 },
+  cancelBtn:         { flex: 1, padding: 14, alignItems: "center", borderRadius: 10, borderWidth: 1, borderColor: "rgba(255,255,255,0.08)" },
+  cancelBtnText:     { color: Colors.textMid, fontWeight: "600", fontSize: 15 },
+  confirmBtn:        { flex: 1, padding: 14, alignItems: "center", borderRadius: 10, backgroundColor: Colors.accent },
+  confirmBtnDisabled:{ opacity: 0.4 },
+  confirmBtnText:    { color: "#fff", fontWeight: "700", fontSize: 15 },
 
-  // Template cards (inside Explore)
-  templateList: { gap: 12, paddingBottom: 16 },
-  templateCard: {
-    backgroundColor: Colors.bgDeep,
-    borderRadius: 14,
-    borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.06)",
-    padding: 16,
-    gap: 12,
-  },
-  templateCardHeader: { flexDirection: "row", alignItems: "flex-start" },
-  templateName: { fontSize: 15, fontWeight: "700", color: Colors.textPrimary },
-  templateSubtitle: { fontSize: 12, color: Colors.textMuted },
-  templateMeta: { fontSize: 11, color: Colors.textFaint, fontWeight: "500" },
-  templateFolderPicker: { gap: 8 },
+  // ── Template cards (Explore) ─────────────────────────────────────────────
+  templateList:        { gap: 12, paddingBottom: 16 },
+  templateCard:        { backgroundColor: Colors.bgDeep, borderRadius: 12, padding: 16, gap: 12 },
+  templateCardHeader:  { flexDirection: "row", alignItems: "flex-start" },
+  templateName:        { fontSize: 15, fontWeight: "700", color: Colors.textPrimary },
+  templateSubtitle:    { fontSize: 12, color: Colors.textMuted },
+  templateMeta:        { fontSize: 11, color: Colors.textFaint, fontWeight: "500" },
+  templateFolderPicker:{ gap: 8 },
   templateCardActions: { flexDirection: "row", gap: 8 },
-  templateAddBtn: {
-    flex: 1,
-    backgroundColor: Colors.accentBg,
-    borderRadius: 9,
-    paddingVertical: 11,
-    alignItems: "center",
-    borderWidth: 1,
-    borderColor: Colors.accentBgMid,
-  },
-  templateAddBtnText: { fontSize: 13, fontWeight: "600", color: Colors.accentLight },
-  templateCancelBtn: {
-    paddingHorizontal: 16,
-    paddingVertical: 11,
-    borderRadius: 9,
-    borderWidth: 1,
-    borderColor: Colors.borderSubtle,
-    alignItems: "center",
-  },
-  templateCancelBtnText: { fontSize: 13, fontWeight: "500", color: Colors.textMuted },
+  templateAddBtn:      { flex: 1, backgroundColor: Colors.accentBg, borderRadius: 9, paddingVertical: 11, alignItems: "center", borderWidth: 1, borderColor: Colors.accentBgMid },
+  templateAddBtnText:  { fontSize: 13, fontWeight: "600", color: Colors.accentLight },
+  templateCancelBtn:   { paddingHorizontal: 16, paddingVertical: 11, borderRadius: 9, borderWidth: 1, borderColor: Colors.borderSubtle, alignItems: "center" },
+  templateCancelBtnText:{ fontSize: 13, fontWeight: "500", color: Colors.textMuted },
 
-  // Folder menu sheet
-  menuSheet: { gap: 0, paddingTop: 16, paddingBottom: 36 },
-  menuSheetHandle: {
-    width: 36,
-    height: 4,
-    borderRadius: 2,
-    backgroundColor: "rgba(255,255,255,0.12)",
-    alignSelf: "center",
-    marginBottom: 16,
-  },
-  menuSheetTitle: {
-    fontSize: 13,
-    fontWeight: "600",
-    color: Colors.textMuted,
-    letterSpacing: 0.5,
-    textTransform: "uppercase",
-    paddingHorizontal: 4,
-    paddingBottom: 8,
-  },
-  menuSheetItem: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 14,
-    paddingVertical: 16,
-    paddingHorizontal: 4,
-  },
-  menuSheetItemText: { fontSize: 16, fontWeight: "500", color: Colors.textLight },
+  // ── Folder menu sheet ────────────────────────────────────────────────────
+  menuSheet:             { gap: 0, paddingTop: 16, paddingBottom: 36 },
+  menuSheetHandle:       { width: 36, height: 4, borderRadius: 2, backgroundColor: "rgba(255,255,255,0.12)", alignSelf: "center", marginBottom: 16 },
+  menuSheetTitle:        { fontSize: 13, fontWeight: "600", color: Colors.textMuted, letterSpacing: -0.1, paddingHorizontal: 4, paddingBottom: 8 },
+  menuSheetItem:         { flexDirection: "row", alignItems: "center", gap: 14, paddingVertical: 16, paddingHorizontal: 4 },
+  menuSheetItemText:     { fontSize: 16, fontWeight: "500", color: Colors.textLight },
   menuSheetItemDestructive: { color: Colors.error },
-  menuSheetDivider: {
-    height: 1,
-    backgroundColor: "rgba(255,255,255,0.06)",
-    marginVertical: 4,
-  },
+  menuSheetDivider:      { height: 0.5, backgroundColor: Colors.separator, marginVertical: 4 },
 
-  // Reorder sheet
+  // ── Reorder sheet ────────────────────────────────────────────────────────
   reorderRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 12,
-    paddingVertical: 14,
-    paddingHorizontal: 4,
-    borderBottomWidth: 1,
-    borderBottomColor: Colors.borderFaint,
+    flexDirection: "row", alignItems: "center", gap: 12,
+    paddingVertical: 14, paddingHorizontal: 4,
+    borderBottomWidth: 0.5, borderBottomColor: Colors.separator,
   },
-  reorderRowActive: {
-    backgroundColor: Colors.accentBgSoft,
-    borderRadius: 10,
-  },
-  reorderRowTarget: {
-    borderBottomColor: Colors.accent,
-    borderBottomWidth: 2,
+  reorderRowActive: { backgroundColor: Colors.accentBgSoft, borderRadius: 10 },
+  reorderRowTarget: { borderBottomColor: Colors.accent, borderBottomWidth: 2,
   },
   reorderRowName: { flex: 1, fontSize: 15, fontWeight: "600", color: Colors.textPrimary },
   dragHandle: {

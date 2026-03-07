@@ -122,7 +122,7 @@ export default function ProfileScreen() {
 
         {/* ── Trophies ── */}
         <View style={styles.sectionHeader}>
-          <Text style={styles.sectionLabel}>TROPHIES</Text>
+          <Text style={styles.sectionLabel}>Trophies</Text>
           <Text style={styles.sectionCount}>
             {trophies?.earnedCount ?? 0}/{trophies?.totalCount ?? 0}
           </Text>
@@ -141,7 +141,7 @@ export default function ProfileScreen() {
         {/* PRs */}
         {trophies?.prs && trophies.prs.length > 0 && (
           <View style={styles.section}>
-            <Text style={styles.subSectionLabel}>CURRENT PRS</Text>
+            <Text style={styles.subSectionLabel}>Current PRs</Text>
             <View style={styles.prGrid}>
               {trophies.prs.map((pr: any) => (
                 <PRCard key={pr.id} pr={pr} />
@@ -155,7 +155,7 @@ export default function ProfileScreen() {
           Object.entries(trophies.byCategory).map(([cat, items]) => (
             <View key={cat} style={styles.section}>
               <Text style={styles.subSectionLabel}>
-                {(categoryLabels[cat] || cat).toUpperCase()}
+                {categoryLabels[cat] || cat}
               </Text>
               <View style={styles.achievementGrid}>
                 {items.map((item: any) => (
@@ -202,7 +202,7 @@ function AchievementBadge({
       style={[
         styles.badge,
         achievement.earned
-          ? { borderColor: achievement.color + "44" }
+          ? { borderWidth: 1, borderColor: achievement.color + "44" }
           : styles.badgeLocked,
       ]}
     >
@@ -267,8 +267,6 @@ const styles = StyleSheet.create({
     width: "100%",
     backgroundColor: Colors.bgCard,
     borderRadius: 14,
-    borderWidth: 1,
-    borderColor: Colors.borderSubtle,
     overflow: "hidden",
   },
   row: {
@@ -291,11 +289,10 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   sectionLabel: {
-    fontSize: 11,
-    fontWeight: "600",
-    color: Colors.textMuted,
-    letterSpacing: 1.2,
-    textTransform: "uppercase",
+    fontSize: 13,
+    fontWeight: "700",
+    color: Colors.textSub,
+    letterSpacing: -0.1,
   },
   sectionCount: { fontSize: 13, fontWeight: "600", color: Colors.textMuted },
 
@@ -310,11 +307,10 @@ const styles = StyleSheet.create({
 
   section: { width: "100%", gap: 10 },
   subSectionLabel: {
-    fontSize: 11,
+    fontSize: 12,
     fontWeight: "600",
-    color: Colors.textFaint,
-    letterSpacing: 1.2,
-    textTransform: "uppercase",
+    color: Colors.textMuted,
+    letterSpacing: -0.1,
     paddingHorizontal: 2,
   },
 
@@ -326,8 +322,6 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     padding: 14,
     gap: 4,
-    borderWidth: 1,
-    borderColor: "rgba(34,197,94,0.2)",
   },
   prCardType: {
     fontSize: 10,
@@ -346,8 +340,6 @@ const styles = StyleSheet.create({
     borderRadius: 14,
     padding: 14,
     gap: 6,
-    borderWidth: 1,
-    borderColor: Colors.borderSubtle,
   },
   badgeLocked: { opacity: 0.45 },
   badgeIcon: { fontSize: 28 },

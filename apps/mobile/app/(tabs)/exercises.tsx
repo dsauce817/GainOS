@@ -121,22 +121,27 @@ export default function ExercisesScreen() {
           <ActivityIndicator color={Colors.accentLight} />
         </View>
       ) : (
-        <FlatList
-          data={filtered}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => <ExerciseCard exercise={item} />}
-          style={{ flex: 1 }}
-          contentContainerStyle={styles.list}
-          showsVerticalScrollIndicator={false}
-          keyboardDismissMode="on-drag"
-          keyboardShouldPersistTaps="handled"
-          ListEmptyComponent={
-            <View style={styles.centered}>
-              <Ionicons name="barbell-outline" size={40} color={Colors.border} />
-              <Text style={styles.emptyText}>No exercises found</Text>
-            </View>
-          }
-        />
+        <View style={styles.listWrapper}>
+          <FlatList
+            data={filtered}
+            keyExtractor={(item) => item.id}
+            renderItem={({ item }) => <ExerciseCard exercise={item} />}
+            style={{ flex: 1 }}
+            contentContainerStyle={styles.list}
+            showsVerticalScrollIndicator={false}
+            keyboardDismissMode="on-drag"
+            keyboardShouldPersistTaps="handled"
+            ItemSeparatorComponent={() => (
+              <View style={{ height: 0.5, backgroundColor: Colors.separator, marginLeft: 16 }} />
+            )}
+            ListEmptyComponent={
+              <View style={styles.centered}>
+                <Ionicons name="barbell-outline" size={40} color={Colors.border} />
+                <Text style={styles.emptyText}>No exercises found</Text>
+              </View>
+            }
+          />
+        </View>
       )}
     </SafeAreaView>
   );
@@ -232,7 +237,8 @@ const styles = StyleSheet.create({
   filterChipText: { fontSize: 13, fontWeight: "500", color: Colors.textMid },
   filterChipTextActive: { color: Colors.accentLight, fontWeight: "600" },
 
-  list: { paddingHorizontal: 16, paddingBottom: 120, gap: 8 },
+  listWrapper: { flex: 1, marginHorizontal: 16, backgroundColor: Colors.bgCard, borderRadius: 14, overflow: "hidden" },
+  list: { paddingBottom: 120 },
 
   centered: {
     flex: 1,
@@ -244,11 +250,8 @@ const styles = StyleSheet.create({
   emptyText: { fontSize: 15, color: Colors.textMuted },
 
   card: {
-    backgroundColor: Colors.bgCard,
-    borderRadius: 14,
-    padding: 14,
-    borderWidth: 1,
-    borderColor: Colors.border,
+    paddingVertical: 13,
+    paddingHorizontal: 16,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",

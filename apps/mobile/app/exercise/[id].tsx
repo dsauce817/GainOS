@@ -156,23 +156,25 @@ export default function ExerciseDetailScreen() {
         {history && history.length > 0 && (
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Recent Sets</Text>
-            {history.slice(0, 10).map((set: any) => (
-              <View key={set.id} style={styles.historyRow}>
-                <View>
-                  <Text style={styles.historyWeight}>
-                    {set.weight_kg}kg × {set.reps} reps
-                  </Text>
-                  <Text style={styles.historyMeta}>
-                    {set.workouts?.name} · {new Date(set.completed_at).toLocaleDateString()}
-                  </Text>
-                </View>
-                {set.is_pr && (
-                  <View style={styles.prBadge}>
-                    <Text style={styles.prBadgeText}>PR</Text>
+            <View style={styles.historyList}>
+              {history.slice(0, 10).map((set: any, i: number) => (
+                <View key={set.id} style={[styles.historyRow, i === Math.min(history.length, 10) - 1 && { borderBottomWidth: 0 }]}>
+                  <View>
+                    <Text style={styles.historyWeight}>
+                      {set.weight_kg}kg × {set.reps} reps
+                    </Text>
+                    <Text style={styles.historyMeta}>
+                      {set.workouts?.name} · {new Date(set.completed_at).toLocaleDateString()}
+                    </Text>
                   </View>
-                )}
-              </View>
-            ))}
+                  {set.is_pr && (
+                    <View style={styles.prBadge}>
+                      <Text style={styles.prBadgeText}>PR</Text>
+                    </View>
+                  )}
+                </View>
+              ))}
+            </View>
           </View>
         )}
       </ScrollView>
@@ -204,8 +206,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 5,
     borderRadius: 8,
-    borderWidth: 1,
-    borderColor: Colors.borderMid,
   },
   tagText: { color: "#9ca3af", fontSize: 12, fontWeight: "500", textTransform: "capitalize" },
   section: { gap: 12 },
@@ -234,8 +234,6 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.successBg,
     borderRadius: 14,
     padding: 16,
-    borderWidth: 1,
-    borderColor: Colors.successBgBorder,
     alignItems: "center",
     gap: 4,
   },
@@ -245,8 +243,6 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.bgCard,
     borderRadius: 14,
     padding: 16,
-    borderWidth: 1,
-    borderColor: Colors.borderMid,
   },
   instructionsText: { color: "#d1d5db", fontSize: 14, lineHeight: 22 },
   tipsCard: {
@@ -257,15 +253,15 @@ const styles = StyleSheet.create({
     borderColor: Colors.warning,
   },
   tipsText: { color: Colors.warningLight, fontSize: 14, lineHeight: 22 },
+  historyList: { backgroundColor: Colors.bgCard, borderRadius: 12, paddingHorizontal: 14, overflow: "hidden" },
   historyRow: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    backgroundColor: Colors.bgCard,
-    borderRadius: 12,
-    padding: 14,
-    borderWidth: 1,
-    borderColor: Colors.borderMid,
+    paddingVertical: 12,
+    paddingHorizontal: 2,
+    borderBottomWidth: 0.5,
+    borderBottomColor: Colors.separator,
   },
   historyWeight: { fontSize: 15, fontWeight: "600", color: Colors.textBright },
   historyMeta: { fontSize: 12, color: "#6b7280", marginTop: 2 },

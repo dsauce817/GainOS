@@ -21,6 +21,7 @@ export const Colors = {
   borderSubtle:  'rgba(255,255,255,0.07)', // very subtle border on dark surfaces
   borderFaint:   'rgba(255,255,255,0.05)', // barely-visible dividers
   borderFainter: 'rgba(255,255,255,0.04)', // almost invisible separators
+  separator:     'rgba(255,255,255,0.12)', // hairline between flat list items
 
   // ─── Text ────────────────────────────────────────────────────────────────
   textBright:  '#F1F4F8', // headings, hero numbers

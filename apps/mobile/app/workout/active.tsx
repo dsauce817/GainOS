@@ -593,8 +593,6 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     padding: 16,
     gap: 12,
-    borderWidth: 1,
-    borderColor: Colors.borderMid,
   },
   exerciseHeader: {
     flexDirection: "row",
@@ -702,12 +700,8 @@ const styles = StyleSheet.create({
   addSetBtn: {
     padding: 12,
     alignItems: "center",
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: Colors.borderMid,
-    borderStyle: "dashed",
   },
-  addSetText: { color: "#6b7280", fontSize: 14, fontWeight: "500" },
+  addSetText: { color: Colors.accentLight, fontSize: 14, fontWeight: "600" },
 
   addExerciseBtn: {
     padding: 20,

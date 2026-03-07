@@ -45,9 +45,9 @@ function getSectionLabel(dateStr: string): string {
   return date.toLocaleDateString("en-US", { month: "long", year: "numeric" });
 }
 
-function WorkoutCard({ workout }: { workout: Workout }) {
+function WorkoutCard({ workout, isLast }: { workout: Workout; isLast?: boolean }) {
   return (
-    <Pressable style={styles.card}>
+    <Pressable style={[styles.card, isLast && { borderBottomWidth: 0 }]}>
       <View style={styles.cardHeader}>
         <Text style={styles.workoutName} numberOfLines={1}>{workout.name}</Text>
         <Text style={styles.workoutDate}>{formatDate(workout.started_at)}</Text>
@@ -129,9 +129,11 @@ export default function HistoryScreen() {
           {sections.map((section) => (
             <View key={section.label}>
               <Text style={styles.sectionLabel}>{section.label}</Text>
-              {section.items.map((workout) => (
-                <WorkoutCard key={workout.id} workout={workout} />
-              ))}
+              <View style={styles.sectionList}>
+                {section.items.map((workout, i) => (
+                  <WorkoutCard key={workout.id} workout={workout} isLast={i === section.items.length - 1} />
+                ))}
+              </View>
             </View>
           ))}
           <View style={{ height: 40 }} />
@@ -160,21 +162,19 @@ const styles = StyleSheet.create({
   list: { paddingHorizontal: 16 },
   sectionLabel: {
     fontSize: 13,
-    fontWeight: "600",
-    color: Colors.textMuted,
-    letterSpacing: 0.5,
-    textTransform: "uppercase",
-    marginTop: 20,
-    marginBottom: 8,
+    fontWeight: "700",
+    color: Colors.textSub,
+    letterSpacing: -0.1,
+    marginTop: 24,
+    marginBottom: 10,
     marginLeft: 4,
   },
+  sectionList: { backgroundColor: Colors.bgCard, borderRadius: 14, overflow: "hidden" },
   card: {
-    backgroundColor: Colors.bgCard,
-    borderRadius: 14,
-    padding: 16,
-    marginBottom: 10,
-    borderWidth: 0.5,
-    borderColor: Colors.border,
+    paddingVertical: 14,
+    paddingHorizontal: 16,
+    borderBottomWidth: 0.5,
+    borderBottomColor: Colors.separator,
   },
   cardHeader: {
     flexDirection: "row",
